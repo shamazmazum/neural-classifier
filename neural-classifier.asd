@@ -10,7 +10,7 @@
                (:file "definitions")
                (:file "utility")
                (:file "neural-network"))
-  :depends-on (:snakes :magicl))
+  :depends-on (:magicl))
 
 (defsystem :neural-classifier/digits
   :name :neural-classifier/digits

@@ -6,5 +6,6 @@
            #:calculate
            #:*learn-rate*
            #:*decay-rate*
+           #:*minibatch-size*
            #:train-epoch
            #:rate))

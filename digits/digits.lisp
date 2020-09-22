@@ -76,12 +76,6 @@
                      (cons (nth idx list) acc))))))
     (do-shuffle list nil)))
 
-(defun make-digits-classifier (inner-layers)
-  ;; Just hardcode the number in the input layer
-  (make-neural-network (list #.(* 28 28) inner-layers 10)
-                       :output-trans #'output-transform
-                       :train-trans  #'train-transform))
-
 (defun add-noise (vector)
   (declare (optimize (speed 3))
            (type magicl:matrix/double-float vector))
@@ -91,22 +85,18 @@
      (min 1d0 (+ x (random 0.1d0))))
    vector))
 
-(defun make-provider-test (list)
-  (let ((shuffled-list (shuffle-list list)))
-    (izip (imap #'car (list->generator shuffled-list))
-          (imap #'cdr (list->generator shuffled-list)))))
-
-(defun make-provider-train (list)
-  (let ((shuffled-list (shuffle-list list)))
-    (izip (imap #'add-noise
-                (imap #'car (list->generator shuffled-list)))
-          (imap #'cdr (list->generator shuffled-list)))))
+(defun make-digits-classifier (inner-layers)
+  ;; Just hardcode the number in the input layer
+  (make-neural-network (list #.(* 28 28) inner-layers 10)
+                       :input-trans  #'add-noise
+                       :output-trans #'output-transform
+                       :train-trans  #'train-transform))
 
 (defun train (classifier)
-  (train-epoch classifier (make-provider-train *train-data*)))
+  (train-epoch classifier (shuffle-list *train-data*)))
 
 (defun rate-digits (classifier list)
-  (rate classifier (make-provider-test list)))
+  (rate classifier list))
 
 (defun train-epochs (classifier n)
   (loop repeat n collect

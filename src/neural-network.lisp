@@ -3,8 +3,6 @@
                    (debug 0)
                    (compilation-speed 0)))
 
-(deftype non-negative-fixnum () '(integer 0 #.most-positive-fixnum))
-
 (defmacro make-neural-network (layout &key input-trans output-trans train-trans)
   "Create a neural network. LAYOUT describes the amount of neurons in each layer."
   `(make-instance 'neural-network
@@ -105,80 +103,106 @@
       (magicl:.- network-output
                  expected-output)))))
 
-(defun calculate-gradient (neural-network input expected-output)
+(defun calculate-gradient (neural-network sample)
   "Calculate gradient of the cost function"
-  (declare (type magicl:matrix/double-float input expected-output))
-  (multiple-value-bind (z output)
-      (calculate-z-and-out neural-network input)
-    (let ((delta (calculate-delta
-                  neural-network z
-                  (car output) expected-output))
-          (output (cons input (reverse output))))
-    (flet ((weight-grad (a delta)
-             (magicl:transpose (magicl:@ a (magicl:transpose delta)))))
-      (values
-       (mapcar #'weight-grad output delta) ;; Weights
-       delta)))))                          ;; Biases
+  (declare (type cons sample))
+  (let ((input    (funcall
+                   (the function (neural-network-input-trans neural-network))
+                   (car sample)))
+        (expected (funcall
+                   (the function (neural-network-train-trans neural-network))
+                   (cdr sample))))
+    (declare (type magicl:matrix/double-float input expected))
+    (multiple-value-bind (z output)
+        (calculate-z-and-out neural-network input)
+      (let ((delta (calculate-delta
+                    neural-network z
+                    (car output) expected))
+            (output (cons input (reverse output))))
+        (flet ((weight-grad (a delta)
+                 (magicl:transpose (magicl:@ a (magicl:transpose delta)))))
+          (values
+           (mapcar #'weight-grad output delta) ;; Weights
+           delta))))))                         ;; Biases
 
-(defun learn (neural-network provider)
-  (declare (type snakes:basic-generator provider))
-  (multiple-value-bind (input expected-output)
-      (funcall provider)
-    (when (not (eq input 'snakes:generator-stop))
-      (let ((input-trans (neural-network-input-trans neural-network))
-            (train-trans (neural-network-train-trans neural-network)))
-        (declare (type function input-trans train-trans))
-        (multiple-value-bind (delta-weight delta-bias)
-            (calculate-gradient neural-network
-                                (funcall input-trans input)
-                                (funcall train-trans expected-output))
-          (flet ((improver (decay)
-                   (declare (type double-float decay))
-                   (lambda (x delta-x)
-                     (declare (type magicl:matrix/double-float x delta-x))
-                     (magicl:.-
-                      (multiply-by-scalar (- 1d0 (* *learn-rate* decay)) x)
-                      (multiply-by-scalar *learn-rate* delta-x)))))
-            (with-accessors ((weights neural-network-weights)
-                             (biases  neural-network-biases))
-                neural-network
-              (setf weights (mapcar (improver *decay-rate*) weights delta-weight)
-                    biases  (mapcar (improver 0d0)          biases  delta-bias))))))
-      t)))
-
-(defun train-epoch (neural-network provider
-                    &optional
-                      (learn-rate *learn-rate*)
-                      (decay-rate *decay-rate*))
-  "Train neural network on N objects provided by PROVIDER."
-  (declare (type double-float learn-rate decay-rate)
-           (type neural-network neural-network))
-  (let ((*learn-rate* learn-rate)
-        (*decay-rate* decay-rate))
+(defun calculate-gradient-minibatch (neural-network samples)
+  (declare (type list samples))
+  (flet ((sum-matrices (matrices1 matrices2)
+           (declare (type list matrices1 matrices2))
+           (mapcar
+            (lambda (matrix1 matrix2)
+              (declare (type magicl:matrix/double-float matrix1 matrix2))
+              (magicl:.+ matrix1 matrix2))
+            matrices1 matrices2)))
     (loop
-       for i fixnum from 0 by 1
-       while (learn neural-network provider)
+       with weights = nil
+       with biases = nil
+       for sample in samples
        do
+         (multiple-value-bind (delta-weight delta-bias)
+             (calculate-gradient neural-network sample)
+           (push delta-weight weights)
+           (push delta-bias biases))
+       finally
+         (return
+           (values
+            (reduce #'sum-matrices weights)
+            (reduce #'sum-matrices biases))))))
+
+(defun learn (neural-network samples)
+  (multiple-value-bind (delta-weight delta-bias)
+      (calculate-gradient-minibatch neural-network samples)
+    (flet ((improver (decay)
+             (declare (type double-float decay))
+             (lambda (x delta-x)
+               (declare (type magicl:matrix/double-float x delta-x))
+               (magicl:.-
+                (multiply-by-scalar (- 1d0 (* *learn-rate* decay)) x)
+                (multiply-by-scalar (/ *learn-rate* *minibatch-size*) delta-x)))))
+      (with-accessors ((weights neural-network-weights)
+                       (biases  neural-network-biases))
+          neural-network
+        (setf weights (mapcar (improver *decay-rate*) weights delta-weight)
+              biases  (mapcar (improver 0d0)          biases  delta-bias))))))
+
+(defun train-epoch (neural-network samples
+                    &key
+                      (learn-rate *learn-rate*)
+                      (decay-rate *decay-rate*)
+                      (minibatch-size *minibatch-size*))
+  "Train neural network on SAMPLES."
+  (declare (type double-float learn-rate decay-rate)
+           (type neural-network neural-network)
+           (type positive-fixnum minibatch-size)
+           (type list samples))
+  (let ((*learn-rate* learn-rate)
+        (*decay-rate* decay-rate)
+        (*minibatch-size* minibatch-size))
+    (loop
+       for current-size = (min (length samples)
+                               *minibatch-size*)
+       for minibatch-samples = (subseq samples 0 current-size)
+       for i fixnum from 0 by *minibatch-size*
+       while minibatch-samples
+       do
+         (learn neural-network minibatch-samples)
+         (setq samples (subseq samples current-size))
          (when (zerop (rem i 1000))
            (format *standard-output* "~d... " i)
            (force-output))
        finally (terpri))))
 
-(defun rate (neural-network provider &key (test #'eql))
+(defun rate (neural-network samples &key (test #'eql))
   "Calculate ratio of correct guesses based on N samples from the PROVIDER."
-  (declare (type snakes:basic-generator provider)
+  (declare (type list samples)
            (type function test))
-  (labels ((rate% (matches total)
-             (declare (type non-negative-fixnum matches total))
-             (multiple-value-bind (input expected-output)
-                 (funcall provider)
-               (if (eq input 'snakes:generator-stop)
-                   (float (/ matches total))
-                   (rate%
-                    (+ matches
-                       (if (funcall test
-                                    (calculate neural-network input)
-                                    expected-output)
-                           1 0))
-                    (1+ total))))))
-    (rate% 0 0)))
+  (loop
+     for sample in samples
+     for input = (car sample)
+     for expected = (cdr sample)
+     count
+       (funcall test
+                (calculate neural-network input)
+                expected)
+     into positive
+     finally (return (float (/ positive (length samples))))))
