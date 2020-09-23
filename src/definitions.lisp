@@ -15,17 +15,17 @@
    (input-trans  :type          function
                  :initarg       :input-trans
                  :initform      #'identity
-                 :reader        neural-network-input-trans
+                 :accessor      neural-network-input-trans
                  :documentation "Function which translates input object to a vector")
    (output-trans :type          function
                  :initarg       :output-trans
                  :initform      #'identity
-                 :reader        neural-network-output-trans
+                 :accessor      neural-network-output-trans
                  :documentation "Function which translates output vector to some object.")
    (train-trans  :type          function
                  :initarg       :train-trans
                  :initform      #'identity
-                 :reader        neural-network-train-trans
+                 :accessor      neural-network-train-trans
                  :documentation "Function which translates expected object to output vector"))
   (:documentation "Class for MPL neural network"))
 
