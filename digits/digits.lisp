@@ -33,8 +33,11 @@
                            :element-type '(unsigned-byte 8))
       (if (/= +label-magic+ (read-ub32/be input))
           (error "Not a MNIST dataset"))
-      (loop repeat (read-ub32/be input) collect
-            (read-byte input)))))
+      (let ((length (read-ub32/be input)))
+        (make-array length
+                    :initial-contents
+                    (loop repeat length collect
+                         (read-byte input)))))))
 
 (defun read-images (which)
   (let ((name (ecase which
@@ -48,42 +51,50 @@
              (rows    (read-ub32/be input))
              (columns (read-ub32/be input))
              (pixels  (* rows columns)))
-        (loop repeat images collect
-              (magicl:from-list
-               (loop repeat pixels collect
-                     (/ (read-byte input) 255d0))
-               (list pixels 1)))))))
+        (make-array images
+                    :initial-contents
+                    (loop repeat images collect
+                         (magicl:from-list
+                          (loop repeat pixels collect
+                               (/ (read-byte input) 255d0))
+                          (list pixels 1))))))))
 
 (defun load-mnist-database ()
   (setq *train-data*
-        (mapcar #'cons
-                (read-images :train)
-                (read-labels :train))
+        (map 'vector #'cons
+             (read-images :train)
+             (read-labels :train))
         *test-data*
-        (mapcar #'cons
-                (read-images :test)
-                (read-labels :test)))
+        (map 'vector #'cons
+             (read-images :test)
+             (read-labels :test)))
   t)
 
-(defun shuffle-list (list)
-  (labels ((do-shuffle (list acc)
-             (if (null list)
-                 acc
-                 (let ((idx (random (length list))))
-                   (do-shuffle
-                       (append (subseq list 0 idx)
-                               (subseq list (1+ idx)))
-                     (cons (nth idx list) acc))))))
-    (do-shuffle list nil)))
+(defun shuffle-vector (vector)
+  (declare (optimize (speed 3))
+           (type simple-vector vector))
+  (loop
+     with length = (length vector)
+     for i below length
+     for j = (random (- length i))
+     for rnd-item = (svref vector j)
+     for end-item = (svref vector (- length 1 i))
+     do
+       (setf (svref vector (- length 1 i)) rnd-item
+             (svref vector j) end-item))
+  vector)
 
 (defun add-noise (vector)
   (declare (optimize (speed 3))
            (type magicl:matrix/double-float vector))
-  (magicl:map
-   (lambda (x)
-     (declare (type double-float x))
-     (min 1d0 (+ x (random 0.1d0))))
-   vector))
+  (flet ((clamp (val min max)
+           (declare (type double-float val min max))
+           (min (max val min) max)))
+    (magicl:map
+     (lambda (x)
+       (declare (type double-float x))
+       (clamp (+ x (random 0.4d0) -0.2d0) 0d0 1d0))
+     vector)))
 
 (defun make-digits-classifier (inner-layers)
   ;; Just hardcode the number in the input layer
@@ -93,10 +104,13 @@
                        :train-trans  #'train-transform))
 
 (defun train (classifier)
-  (train-epoch classifier (shuffle-list *train-data*)))
+  (train-epoch classifier
+               (coerce (shuffle-vector *train-data*)
+                       'list)))
 
-(defun rate-digits (classifier list)
-  (rate classifier list))
+(defun rate-digits (classifier vector)
+  (rate classifier
+        (coerce vector 'list)))
 
 (defun train-epochs (classifier n)
   (loop repeat n collect
