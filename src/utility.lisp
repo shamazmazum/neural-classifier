@@ -29,23 +29,3 @@
            (type double-float z))
   (let ((sigma (sigma z)))
     (* sigma (- 1d0 sigma))))
-
-(defun multiply-by-scalar (x matrix)
-  "Multiply a matrix by scalar X. Seems to be missing in magicl."
-  (declare (optimize (speed 3))
-           (type double-float x))
-  (magicl:map
-   (lambda (y)
-     (declare (type double-float y))
-     (* x y))
-   matrix))
-
-(defun divide-by-scalar (x matrix)
-  "Multiply a matrix by scalar X. Seems to be missing in magicl."
-  (declare (optimize (speed 3))
-           (type double-float x))
-  (magicl:map
-   (lambda (y)
-     (declare (type double-float y))
-     (/ y x))
-   matrix))

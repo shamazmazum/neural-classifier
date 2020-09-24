@@ -70,7 +70,7 @@
                     bias-rest
                     out
                     (cons z z-acc)
-                    (cons out z-acc)))
+                    (cons out out-acc)))
                  (values
                   z-acc
                   out-acc))))
@@ -129,11 +129,8 @@
   (declare (type list samples))
   (flet ((sum-matrices (matrices1 matrices2)
            (declare (type list matrices1 matrices2))
-           (mapcar
-            (lambda (matrix1 matrix2)
-              (declare (type magicl:matrix/double-float matrix1 matrix2))
-              (magicl:.+ matrix1 matrix2))
-            matrices1 matrices2)))
+           (mapcar #'magicl:.+
+                   matrices1 matrices2)))
     (loop
        with weights = nil
        with biases = nil
@@ -157,8 +154,8 @@
              (lambda (x delta-x)
                (declare (type magicl:matrix/double-float x delta-x))
                (magicl:.-
-                (multiply-by-scalar (- 1d0 (* *learn-rate* decay)) x)
-                (multiply-by-scalar (/ *learn-rate* *minibatch-size*) delta-x)))))
+                (magicl:.* (- 1d0 (* *learn-rate* decay)) x)
+                (magicl:.* (/ *learn-rate* *minibatch-size*) delta-x)))))
       (with-accessors ((weights neural-network-weights)
                        (biases  neural-network-biases))
           neural-network
