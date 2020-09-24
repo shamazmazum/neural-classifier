@@ -43,9 +43,9 @@
     (flet ((calculate-layer (input weights-and-biases)
              (destructuring-bind (weights . biases)
                  weights-and-biases
-               (magicl:map #'sigma
-                           (magicl:.+ (magicl:@ weights input)
-                                      biases)))))
+               (magicl:map! #'sigma
+                            (magicl:.+ (magicl:@ weights input)
+                                       biases)))))
       (funcall
        output-trans
        (reduce #'calculate-layer
@@ -93,7 +93,7 @@
                              (cdr z)
                              (cons
                               (magicl:.* (magicl:map #'sigma% z-l)
-                                         (magicl:@ (magicl:transpose w-l+1) delta-l+1))
+                                         (magicl:mult w-l+1 delta-l+1 :transa :t))
                               acc)))
                  acc)))
     (backprop
@@ -120,7 +120,7 @@
                     (car output) expected))
             (output (cons input (reverse output))))
         (flet ((weight-grad (a delta)
-                 (magicl:transpose (magicl:@ a (magicl:transpose delta)))))
+                 (magicl:transpose (magicl:mult a delta :transb :t))))
           (values
            (mapcar #'weight-grad output delta) ;; Weights
            delta))))))                         ;; Biases
