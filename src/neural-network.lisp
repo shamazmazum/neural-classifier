@@ -4,7 +4,34 @@
                    (compilation-speed 0)))
 
 (defmacro make-neural-network (layout &key input-trans output-trans train-trans)
-  "Create a neural network. LAYOUT describes the amount of neurons in each layer."
+  "Create a new neural network.
+
+@c(layout) is a list of positive integers which describes the amount
+of neurons in each layer from input to output.
+
+@(input-trans) is a function which is applied to an object passed to
+@c(calculate) to transform it into an input column (that is a matrix
+with the type @c(matrix/double-float) and the shape @c(Nx1), where
+@c(N) is the first number in the @c(layout)). For example, if we are
+recognizing digits from the MNIST set, this function can take a number
+of an image in the set and return @c(784x1) matrix.
+
+@c(output-trans) is a function which is applied to the output of
+@c(calculate) function (that is a matrix with the type
+@c(matrix/double-float) and the shape Mx1, where M is the last number
+in the @c(layout)) to return some object with user-defined
+meaning. Again, if we are recognizing digits, this function transforms
+@c(10x1) matrix to a number from 0 to 9.
+
+@c(train-trans) is a function which is applied to an object from the
+train set to get a column (that is a matrix with the type
+@c(matrix/double-float) and the shape @c(Mx1), where @c(M) is the last
+number in the @c(layout)) which is optimal output from the network for
+this object. With digits recognition, this function may take a digit
+@c(n) and return @c(10x1) matrix of all zeros with exception for
+@c(n)-th element which would be @c(1d0).
+
+Default value for all transformation functions is @c(identity)."
   `(make-instance 'neural-network
                   :layout ,layout
                   ,@(if input-trans  `(:input-trans  ,input-trans))
@@ -33,7 +60,10 @@
 
 ;; Normal work
 (defun calculate (neural-network object)
-  "Calculate the output from the network NEURAL-NETWORK for the object OBJECT."
+  "Calculate the output from the network @c(neural-network) for the
+object @c(object). The input transformation function is applied to the
+@c(object) and the output transformation function is applied to the
+output column from the network."
   (declare (type neural-network neural-network))
   (let ((weights (neural-network-weights neural-network))
         (biases  (neural-network-biases  neural-network))
@@ -126,6 +156,7 @@
            delta))))))                         ;; Biases
 
 (defun calculate-gradient-minibatch (neural-network samples)
+  "Calculate gradient of the cost function based on multiple input samples"
   (declare (type list samples))
   (flet ((sum-matrices (matrices1 matrices2)
            (declare (type list matrices1 matrices2))
@@ -167,7 +198,8 @@
                       (learn-rate *learn-rate*)
                       (decay-rate *decay-rate*)
                       (minibatch-size *minibatch-size*))
-  "Train neural network on SAMPLES."
+  "Perform a training of @c(neural-network) on every object from the
+list @c(samples)."
   (declare (type double-float learn-rate decay-rate)
            (type neural-network neural-network)
            (type positive-fixnum minibatch-size)
@@ -190,7 +222,12 @@
        finally (terpri))))
 
 (defun rate (neural-network samples &key (test #'eql))
-  "Calculate ratio of correct guesses based on N samples from the PROVIDER."
+  "Calculate accuracy of the @c(neural-network) (that is ratio of
+correctly guessed samples to all samples) using testing data from
+the list @c(samples). Each item in @c(samples) must be a cons pair of
+object which is passed to @c(calculate) and the correct output from
+@c(calculate). @c(test) is a function used to compare the correct
+output and the actual one."
   (declare (type list samples)
            (type function test))
   (loop

@@ -1,7 +1,7 @@
 (in-package :neural-classifier)
 
 (defun nrandom-generator (&key (sigma 1d0) (mean 0d0))
-  "Create a generator which generates normally(0,1) distributed values"
+  "Create a generator which generates normally(mean, sigma) distributed values"
   (declare (type double-float sigma mean))
   (let (acc)
     (lambda ()
@@ -24,7 +24,7 @@
   (/ 1d0 (1+ (exp (- z)))))
 
 (defun sigma% (z)
-  "The first derivative of SIGMA."
+  "The first derivative of @c(sigma)."
   (declare (optimize (speed 3))
            (type double-float z))
   (let ((sigma (sigma z)))

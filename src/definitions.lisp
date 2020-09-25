@@ -8,7 +8,7 @@
                  :documentation "Number of neurons in each layer of the network")
    (weights      :type          list
                  :accessor      neural-network-weights
-                 :documentation "Input weight matrices for each layer")
+                 :documentation "Weight matrices for each layer")
    (biases       :type          list
                  :accessor      neural-network-biases
                  :documentation "Bias vectors for each layer")
@@ -27,7 +27,7 @@
                  :initform      #'identity
                  :accessor      neural-network-train-trans
                  :documentation "Function which translates expected object to output vector"))
-  (:documentation "Class for MPL neural network"))
+  (:documentation "Class for neural networks"))
 
 (deftype non-negative-fixnum () '(integer 0 #.most-positive-fixnum))
 (deftype positive-fixnum () '(integer 1 #.most-positive-fixnum))
@@ -38,5 +38,6 @@
 (defparameter *learn-rate* 0.005d0
   "Speed of gradient descent algorithm")
 (defparameter *decay-rate* 0d0
-  "Speed of parameter decay")
-(defparameter *minibatch-size* 10)
+  "Speed of weights decay λ/N")
+(defparameter *minibatch-size* 10
+  "Number of samples to be used in stochastic gradient descent")

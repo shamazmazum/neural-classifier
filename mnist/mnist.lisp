@@ -96,10 +96,11 @@
        (clamp (+ x (random 0.4d0) -0.2d0) 0d0 1d0))
      vector)))
 
-(defun make-mnist-classifier (inner-layers)
-  ;; Just hardcode the number in the input layer
+(defun make-mnist-classifier (inner-neurons)
+  "Make a neural network to classify digits from the MNIST
+dataset. @c(inner-neurons) is a number of neurons in the inner layer."
   (neural-classifier:make-neural-network
-   (list #.(* 28 28) inner-layers 10)
+   (list #.(* 28 28) inner-neurons 10)
    :input-trans  #'add-noise
    :output-trans #'output-transform
    :train-trans  #'train-transform))
@@ -116,6 +117,8 @@
    (coerce vector 'list)))
 
 (defun train-epochs (classifier n)
+  "Train a neural network @c(classifier) for @c(n) epochs.
+Return a list of accuracy data for each epoch of training."
   (loop repeat n collect
        (progn
          (train-epoch classifier)
