@@ -13,14 +13,14 @@
                (:file "neural-network"))
   :depends-on (:magicl))
 
-(defsystem :neural-classifier/digits
-  :name :neural-classifier/digits
+(defsystem :neural-classifier/mnist
+  :name :neural-classifier/mnist
   :version "0.1"
   :author "Vasily Postnicov <shamaz.mazum at gmail dot com>"
-  :description "Recognition of handwritten digits based on MNIST dataset."
+  :description "Recognition of handwritten digits based on MNIST/EMNIST datasets."
   :licence "2-clause BSD"
-  :pathname "digits/"
+  :pathname "mnist/"
   :serial t
   :components ((:file "package")
-               (:file "digits"))
+               (:file "mnist"))
   :depends-on (:neural-classifier :nibbles))
