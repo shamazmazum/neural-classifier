@@ -7,6 +7,7 @@
   :pathname "src/"
   :serial t
   :components ((:file "package")
+               (:file "magicl-blas")
                (:file "definitions")
                (:file "utility")
                (:file "neural-network"))

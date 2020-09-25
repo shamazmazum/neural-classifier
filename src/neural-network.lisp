@@ -120,7 +120,7 @@
                     (car output) expected))
             (output (cons input (reverse output))))
         (flet ((weight-grad (a delta)
-                 (magicl:transpose (magicl:mult a delta :transb :t))))
+                 (magicl:mult delta a :transb :t)))
           (values
            (mapcar #'weight-grad output delta) ;; Weights
            delta))))))                         ;; Biases
