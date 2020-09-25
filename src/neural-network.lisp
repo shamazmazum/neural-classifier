@@ -240,3 +240,11 @@ output and the actual one."
                 expected)
      into positive
      finally (return (float (/ positive (length samples))))))
+
+#+sbcl
+(progn
+  (format t "Disabling floating point traps~%")
+  (sb-int:set-floating-point-modes :traps '(:divide-by-zero)))
+#-sbcl
+(progn
+  (format t "You may wish to disable floating point traps, especially overflow~%"))

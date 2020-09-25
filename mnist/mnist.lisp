@@ -124,3 +124,9 @@ Return a list of accuracy data for each epoch of training."
          (train-epoch classifier)
          (cons (rate classifier *train-data*)
                (rate classifier *test-data*)))))
+
+(progn
+  (format t "Place MNIST dataset to ~a (controlled by ~a) and run ~a~%"
+          *mnist-dataset-path*
+          '*mnist-dataset-path*
+          'load-mnist-database))
