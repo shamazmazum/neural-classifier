@@ -1,10 +1,12 @@
 # Neural-classifier
+[![Build Status](https://travis-ci.com/shamazmazum/neural-classifier.svg?branch=master)](https://travis-ci.com/shamazmazum/neural-classifier)
 
 `neural-classifier` is a neural network library based on the first chapters
 from [this book](http://neuralnetworksanddeeplearning.com/). It is divided on
 two systems: `neural-classifier` which is a general API for neural networks
 and `neural-classifier/mnist` which contains helper functions for working with
-MNIST/EMNIST datasets.
+MNIST/EMNIST datasets. For API documentation visit
+[this page](http://shamazmazum.github.io/neural-classifier).
 
 ## How to work with MNIST dataset?
 
