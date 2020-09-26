@@ -1,0 +1,47 @@
+@begin[ref=index](section)
+   @title(Overview)
+   @c(neural-classifier) is a library for working with neural networks and
+   solving classification problem (and maybe other problems). For a basic use
+   read README file on the
+   @link[uri="http://github.com/shamazmazum/neural-classifier"](GitHub page).
+   Here the API is described in more details.
+@end(section)
+
+@begin(section)
+   @title(General information)
+   Typical neural network lifecycle is the following:
+   @begin(enum)
+      @item(Adjust @c(neural-classifier:*learn-rate*),
+            @c(neural-classifier:*decay-rate*) and
+            @c(neural-classifier:*minibatch-size*) parameters if you want.)
+      @item(Create a neural network with
+            @c(neural-classifier:make-neural-network).)
+      @item(Train neural network for @c(N) epochs with calling
+            @c(neural-classifier:train-epoch) @c(N) times. You can use
+            @c(neural-classifier:rate) function to control the accuracy of your
+            network, so you know where to stop training.)
+      @item(After the net is trained, call @c(neural-classifier:calculate) to
+            pass your data through the net.)
+   @end(enum)
+@end(section)
+
+@begin(section)
+   @title(API documentation)
+   @u(Hyper-parameters)
+   @cl:with-package[name="neural-classifier"](
+      @cl:doc(variable *learn-rate*)
+      @cl:doc(variable *decay-rate*)
+      @cl:doc(variable *minibatch-size*)
+   )
+   @u(Neural network class and accessors)
+   @cl:with-package[name="neural-classifier"](
+      @cl:doc(class neural-network)
+   )
+   @u(Functions)
+   @cl:with-package[name="neural-classifier"](
+      @cl:doc(macro make-neural-network)
+      @cl:doc(function calculate)
+      @cl:doc(function train-epoch)
+      @cl:doc(function rate)
+   )
+@end(section)

@@ -36,8 +36,12 @@
                *learn-rate* *decay-rate*)
          (type positive-fixnum *minibatch-size*))
 (defparameter *learn-rate* 0.005d0
-  "Speed of gradient descent algorithm")
+  "Speed of gradient descent algorithm. Bigger values result in faster
+learning, but too big is bad.")
 (defparameter *decay-rate* 0d0
-  "Speed of weights decay λ/N")
+  "Regularization parameter @c(λ/N), where @c(N) is the number of
+objects in the training set and @c(λ) must be about 1-10. If not sure,
+start with zero (which is the default).")
 (defparameter *minibatch-size* 10
-  "Number of samples to be used in stochastic gradient descent")
+  "Number of samples to be used in stochastic gradient descent
+algorithm.")

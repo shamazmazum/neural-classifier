@@ -6,30 +6,35 @@
 (defmacro make-neural-network (layout &key input-trans output-trans train-trans)
   "Create a new neural network.
 
-@c(layout) is a list of positive integers which describes the amount
-of neurons in each layer from input to output.
 
-@(input-trans) is a function which is applied to an object passed to
+@c(layout) is a list of positive integers which describes the amount
+of neurons in each layer (starting from input layer).
+
+
+@c(input-trans) is a function which is applied to an object passed to
 @c(calculate) to transform it into an input column (that is a matrix
-with the type @c(matrix/double-float) and the shape @c(Nx1), where
-@c(N) is the first number in the @c(layout)). For example, if we are
-recognizing digits from the MNIST set, this function can take a number
-of an image in the set and return @c(784x1) matrix.
+with the type @c(magicl:matrix/double-float) and the shape @c(Nx1),
+where @c(N) is the first number in the @c(layout)). For example, if we
+are recognizing digits from the MNIST set, this function can take a
+number of an image in the set and return @c(784x1) matrix.
+
 
 @c(output-trans) is a function which is applied to the output of
 @c(calculate) function (that is a matrix with the type
-@c(matrix/double-float) and the shape Mx1, where M is the last number
-in the @c(layout)) to return some object with user-defined
+@c(magicl:matrix/double-float) and the shape Mx1, where M is the last
+number in the @c(layout)) to return some object with user-defined
 meaning. Again, if we are recognizing digits, this function transforms
 @c(10x1) matrix to a number from 0 to 9.
 
+
 @c(train-trans) is a function which is applied to an object from the
 train set to get a column (that is a matrix with the type
-@c(matrix/double-float) and the shape @c(Mx1), where @c(M) is the last
-number in the @c(layout)) which is optimal output from the network for
-this object. With digits recognition, this function may take a digit
-@c(n) and return @c(10x1) matrix of all zeros with exception for
-@c(n)-th element which would be @c(1d0).
+@c(magicl:matrix/double-float) and the shape @c(Mx1), where @c(M) is
+the last number in the @c(layout)) which is optimal output from the
+network for this object. With digits recognition, this function may
+take a digit @c(n) and return @c(10x1) matrix of all zeros with
+exception for @c(n)-th element which would be @c(1d0).
+
 
 Default value for all transformation functions is @c(identity)."
   `(make-instance 'neural-network
@@ -199,7 +204,9 @@ output column from the network."
                       (decay-rate *decay-rate*)
                       (minibatch-size *minibatch-size*))
   "Perform a training of @c(neural-network) on every object from the
-list @c(samples)."
+list @c(samples). Each item in @c(samples) must be a cons pair
+containing an object which is passed to the neural network and the
+expected output for that object (after the output transformation)."
   (declare (type double-float learn-rate decay-rate)
            (type neural-network neural-network)
            (type positive-fixnum minibatch-size)
@@ -222,12 +229,12 @@ list @c(samples)."
        finally (terpri))))
 
 (defun rate (neural-network samples &key (test #'eql))
-  "Calculate accuracy of the @c(neural-network) (that is ratio of
+  "Calculate accuracy of the @c(neural-network) (that is a ratio of
 correctly guessed samples to all samples) using testing data from
-the list @c(samples). Each item in @c(samples) must be a cons pair of
-object which is passed to @c(calculate) and the correct output from
-@c(calculate). @c(test) is a function used to compare the correct
-output and the actual one."
+the list @c(samples). Each item in @c(samples) must be a cons pair
+containing an object which is passed to the network and the expected
+output for that object (after the output transformation). @c(test) is
+a function used to compare the expected output and the actual one."
   (declare (type list samples)
            (type function test))
   (loop
