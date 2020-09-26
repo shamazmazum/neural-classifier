@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+  General information &ndash; neural-classifier
+</title>
+    <link rel="stylesheet" href="static/style.css"/>
+    
+  <link rel="stylesheet" href="static/highlight.css"/>
+  <script src="static/highlight.js"></script>
+  <style>
+   /* Highlight the current top-level TOC item, and hide the TOC of all other items */
+
+   .toc a[data-node="general-information"] {
+       color: #AD3108;
+   }
+
+   .toc ol {
+       display: none;
+   }
+
+   .toc > ol {
+       display: block;
+   }
+
+   .toc li a[data-node="general-information"] + ol {
+       display: block;
+   }
+
+   .toc li a[data-node="general-information"] + ol li {
+       font-size: 16px;
+       margin: 0 10px;
+   }
+
+   .toc li a[active] + ol li:first-child {
+       margin-top: 5px;
+   }
+  </style>
+
+  </head>
+  <body>
+    
+  <h1 class="doc-title">neural-classifier » General information</h1>
+  <article id="article" data-section="general-information">
+    <aside>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+    </aside>
+    <main class="codex-section">
+      
+   Typical neural network lifecycle is the following:
+   <ol><li>Adjust <code>neural-classifier:*learn-rate*</code>,
+            <code>neural-classifier:*decay-rate*</code> and
+            <code>neural-classifier:*minibatch-size*</code> parameters if you want.</li><li>Create a neural network with
+            <code>neural-classifier:make-neural-network</code>.</li><li>Train neural network for <code>N</code> epochs with calling
+            <code>neural-classifier:train-epoch</code><code>N</code> times. You can use
+            <code>neural-classifier:rate</code> function to control the accuracy of your
+            network, so you know where to stop training.</li><li>After the net is trained, call <code>neural-classifier:calculate</code> to
+            pass your data through the net.</li></ol>
+
+    </main>
+  </article>
+  <footer>
+    <div class="info">
+      Created with <a href="https://github.com/CommonDoc/codex">Codex</a>.
+    </div>
+  </footer>
+  <script>
+   HighlightLisp.highlight_auto();
+  </script>
+
+  </body>
+</html>
