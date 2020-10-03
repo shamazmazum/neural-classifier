@@ -2,12 +2,12 @@
 
 (in-package :magicl)
 ;; Scalar - matrix multiplication
-(defmethod .* ((source1 double-float)
-               (source2 matrix/double-float)
+(defmethod .* ((source1 single-float)
+               (source2 matrix/single-float)
                &optional target)
   (declare (ignore target))
   (let ((copy (deep-copy-tensor source2)))
-    (magicl.blas-cffi:%dscal
+    (magicl.blas-cffi:%sscal
      (size source2)
      source1
      (storage copy)
@@ -15,32 +15,32 @@
     copy))
 
 ;; Matrix addition
-(defmethod .+ ((source1 matrix/double-float)
-               (source2 matrix/double-float)
+(defmethod .+ ((source1 matrix/single-float)
+               (source2 matrix/single-float)
                &optional target)
   (declare (ignore target))
   (policy-cond:with-expectations (> speed safety)
       ((assertion (equalp (shape source1)
                           (shape source2)))))
   (let ((copy (deep-copy-tensor source2)))
-    (magicl.blas-cffi:%daxpy
+    (magicl.blas-cffi:%saxpy
      (size source2)
-     1d0
+     1f0
      (storage source1) 1
      (storage copy) 1)
     copy))
 
-(defmethod .- ((source1 matrix/double-float)
-               (source2 matrix/double-float)
+(defmethod .- ((source1 matrix/single-float)
+               (source2 matrix/single-float)
                &optional target)
   (declare (ignore target))
   (policy-cond:with-expectations (> speed safety)
       ((assertion (equalp (shape source1)
                           (shape source2)))))
   (let ((copy (deep-copy-tensor source1)))
-    (magicl.blas-cffi:%daxpy
+    (magicl.blas-cffi:%saxpy
      (size source2)
-     -1d0
+     -1f0
      (storage source2) 1
      (storage copy) 1)
     copy))

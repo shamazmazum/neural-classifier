@@ -32,13 +32,13 @@
 (deftype non-negative-fixnum () '(integer 0 #.most-positive-fixnum))
 (deftype positive-fixnum () '(integer 1 #.most-positive-fixnum))
 
-(declaim (type double-float
+(declaim (type single-float
                *learn-rate* *decay-rate*)
          (type positive-fixnum *minibatch-size*))
-(defparameter *learn-rate* 0.005d0
+(defparameter *learn-rate* 0.005f0
   "Speed of gradient descent algorithm. Bigger values result in faster
 learning, but too big is bad.")
-(defparameter *decay-rate* 0d0
+(defparameter *decay-rate* 0f0
   "Regularization parameter @c(λ/N), where @c(N) is the number of
 objects in the training set and @c(λ) must be about 1-10. If not sure,
 start with zero (which is the default).")

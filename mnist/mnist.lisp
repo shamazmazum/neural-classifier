@@ -12,7 +12,7 @@
 
 (defun output-transform (output)
   (declare (optimize (speed 3))
-           (type magicl:matrix/double-float output))
+           (type magicl:matrix/single-float output))
   (let* ((output% (loop for i below 10 collect (magicl:tref output i 0)))
          (max (reduce #'max output%)))
     (declare (type list output%))
@@ -21,8 +21,10 @@
 (defun train-transform (digit)
   (declare (optimize (speed 3))
            (type (integer 0 9) digit))
-  (let ((vector (magicl:zeros '(10 1))))
-    (setf (magicl:tref vector digit 0) 1d0)
+  (let ((vector (magicl:zeros
+                 '(10 1)
+                 :type 'single-float)))
+    (setf (magicl:tref vector digit 0) 1f0)
     vector))
 
 (defun read-labels (which)
@@ -56,7 +58,7 @@
                     (loop repeat images collect
                          (magicl:from-list
                           (loop repeat pixels collect
-                               (/ (read-byte input) 255d0))
+                               (/ (read-byte input) 255f0))
                           (list pixels 1))))))))
 
 (defun load-mnist-database ()
@@ -86,24 +88,24 @@
 
 (defun add-noise (vector)
   (declare (optimize (speed 3))
-           (type magicl:matrix/double-float vector))
+           (type magicl:matrix/single-float vector))
   (flet ((clamp (val min max)
-           (declare (type double-float val min max))
+           (declare (type single-float val min max))
            (min (max val min) max)))
     (magicl:map
      (lambda (x)
-       (declare (type double-float x))
-       (clamp (+ x (random 0.4d0) -0.2d0) 0d0 1d0))
+       (declare (type single-float x))
+       (clamp (+ x (random 0.4f0) -0.2f0) 0f0 1f0))
      vector)))
 
 (defun possibly-invert (vector)
   (declare (optimize (speed 3))
-           (type magicl:matrix/double-float vector))
+           (type magicl:matrix/single-float vector))
   (if (< (random 1.0) 0.5)
       (magicl:map
        (lambda (x)
-         (declare (type double-float x))
-         (- 1d0 x))
+         (declare (type single-float x))
+         (- 1f0 x))
        vector)
       vector))
 

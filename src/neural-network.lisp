@@ -13,7 +13,7 @@ of neurons in each layer (starting from input layer).
 
 @c(input-trans) is a function which is applied to an object passed to
 @c(calculate) to transform it into an input column (that is a matrix
-with the type @c(magicl:matrix/double-float) and the shape @c(Nx1),
+with the type @c(magicl:matrix/single-float) and the shape @c(Nx1),
 where @c(N) is the first number in the @c(layout)). For example, if we
 are recognizing digits from the MNIST set, this function can take a
 number of an image in the set and return @c(784x1) matrix.
@@ -21,7 +21,7 @@ number of an image in the set and return @c(784x1) matrix.
 
 @c(output-trans) is a function which is applied to the output of
 @c(calculate) function (that is a matrix with the type
-@c(magicl:matrix/double-float) and the shape Mx1, where M is the last
+@c(magicl:matrix/single-float) and the shape Mx1, where M is the last
 number in the @c(layout)) to return some object with user-defined
 meaning. Again, if we are recognizing digits, this function transforms
 @c(10x1) matrix to a number from 0 to 9.
@@ -29,11 +29,11 @@ meaning. Again, if we are recognizing digits, this function transforms
 
 @c(train-trans) is a function which is applied to an object from the
 train set to get a column (that is a matrix with the type
-@c(magicl:matrix/double-float) and the shape @c(Mx1), where @c(M) is
+@c(magicl:matrix/single-float) and the shape @c(Mx1), where @c(M) is
 the last number in the @c(layout)) which is optimal output from the
 network for this object. With digits recognition, this function may
 take a digit @c(n) and return @c(10x1) matrix of all zeros with
-exception for @c(n)-th element which would be @c(1d0).
+exception for @c(n)-th element which would be @c(1f0).
 
 
 Default value for all transformation functions is @c(identity)."
@@ -51,11 +51,13 @@ Default value for all transformation functions is @c(identity)."
                           :distribution (nrandom-generator
                                          :sigma (/
                                                  (sqrt
-                                                  (the (double-float 0d0)
-                                                       (float columns 0d0)))))))
+                                                  (the (single-float 0f0)
+                                                       (float columns 0f0)))))
+                          :type 'single-float))
            (make-bias-vector (rows)
              (magicl:rand (list rows 1)
-                          :distribution (nrandom-generator))))
+                          :distribution (nrandom-generator)
+                          :type 'single-float)))
       (setf (neural-network-weights neural-network)
             (mapcar #'make-weight-matrix
                     (cdr layout) layout)
@@ -91,7 +93,7 @@ output column from the network."
 (defun calculate-z-and-out (neural-network input)
   "Calculate argument and value of sigma for all layers"
   (declare (type neural-network neural-network)
-           (type magicl:matrix/double-float input))
+           (type magicl:matrix/single-float input))
   (labels ((accumulate-z-and-out (weights biases input z-acc out-acc)
              (if (and weights biases)
                  (let* ((weight (car weights))
@@ -118,7 +120,7 @@ output column from the network."
 
 (defun calculate-delta (neural-network z network-output expected-output)
   "Calculate partial derivative of the cost function by z for all layers"
-  (declare (type magicl:matrix/double-float expected-output))
+  (declare (type magicl:matrix/single-float expected-output))
   (labels ((backprop (weight z acc)
              (if z
                  (let ((delta-l+1 (car acc))
@@ -147,7 +149,7 @@ output column from the network."
         (expected (funcall
                    (the function (neural-network-train-trans neural-network))
                    (cdr sample))))
-    (declare (type magicl:matrix/double-float input expected))
+    (declare (type magicl:matrix/single-float input expected))
     (multiple-value-bind (z output)
         (calculate-z-and-out neural-network input)
       (let ((delta (calculate-delta
@@ -186,17 +188,17 @@ output column from the network."
   (multiple-value-bind (delta-weight delta-bias)
       (calculate-gradient-minibatch neural-network samples)
     (flet ((improver (decay)
-             (declare (type double-float decay))
+             (declare (type single-float decay))
              (lambda (x delta-x)
-               (declare (type magicl:matrix/double-float x delta-x))
+               (declare (type magicl:matrix/single-float x delta-x))
                (magicl:.-
-                (magicl:.* (- 1d0 (* *learn-rate* decay)) x)
+                (magicl:.* (- 1f0 (* *learn-rate* decay)) x)
                 (magicl:.* (/ *learn-rate* *minibatch-size*) delta-x)))))
       (with-accessors ((weights neural-network-weights)
                        (biases  neural-network-biases))
           neural-network
         (setf weights (mapcar (improver *decay-rate*) weights delta-weight)
-              biases  (mapcar (improver 0d0)          biases  delta-bias))))))
+              biases  (mapcar (improver 0f0)          biases  delta-bias))))))
 
 (defun train-epoch (neural-network samples
                     &key
@@ -207,7 +209,7 @@ output column from the network."
 list @c(samples). Each item in @c(samples) must be a cons pair
 containing an object which is passed to the neural network and the
 expected output for that object (after the output transformation)."
-  (declare (type double-float learn-rate decay-rate)
+  (declare (type single-float learn-rate decay-rate)
            (type neural-network neural-network)
            (type positive-fixnum minibatch-size)
            (type list samples))
