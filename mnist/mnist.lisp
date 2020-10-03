@@ -96,12 +96,23 @@
        (clamp (+ x (random 0.4d0) -0.2d0) 0d0 1d0))
      vector)))
 
+(defun possibly-invert (vector)
+  (declare (optimize (speed 3))
+           (type magicl:matrix/double-float vector))
+  (if (< (random 1.0) 0.5)
+      (magicl:map
+       (lambda (x)
+         (declare (type double-float x))
+         (- 1d0 x))
+       vector)
+      vector))
+
 (defun make-mnist-classifier (inner-neurons)
   "Make a neural network to classify digits from the MNIST
 dataset. @c(inner-neurons) is a number of neurons in the inner layer."
   (neural-classifier:make-neural-network
    (list #.(* 28 28) inner-neurons 10)
-   :input-trans  #'add-noise
+   :input-trans  #'possibly-invert
    :output-trans #'output-transform
    :train-trans  #'train-transform))
 
