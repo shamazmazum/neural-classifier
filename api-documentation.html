@@ -71,23 +71,23 @@ algorithm.</div></div>
 of neurons in each layer (starting from input layer).</p><p>
 <code>input-trans</code> is a function which is applied to an object passed to
 <code>calculate</code> to transform it into an input column (that is a matrix
-with the type <code>magicl:matrix/double-float</code> and the shape <code>Nx1</code>,
+with the type <code>magicl:matrix/single-float</code> and the shape <code>Nx1</code>,
 where <code>N</code> is the first number in the <code>layout</code>). For example, if we
 are recognizing digits from the MNIST set, this function can take a
 number of an image in the set and return <code>784x1</code> matrix.</p><p>
 <code>output-trans</code> is a function which is applied to the output of
 <code>calculate</code> function (that is a matrix with the type
-<code>magicl:matrix/double-float</code> and the shape Mx1, where M is the last
+<code>magicl:matrix/single-float</code> and the shape Mx1, where M is the last
 number in the <code>layout</code>) to return some object with user-defined
 meaning. Again, if we are recognizing digits, this function transforms
 <code>10x1</code> matrix to a number from 0 to 9.</p><p>
 <code>train-trans</code> is a function which is applied to an object from the
 train set to get a column (that is a matrix with the type
-<code>magicl:matrix/double-float</code> and the shape <code>Mx1</code>, where <code>M</code> is
+<code>magicl:matrix/single-float</code> and the shape <code>Mx1</code>, where <code>M</code> is
 the last number in the <code>layout</code>) which is optimal output from the
 network for this object. With digits recognition, this function may
 take a digit <code>n</code> and return <code>10x1</code> matrix of all zeros with
-exception for <code>n</code>-th element which would be <code>1d0</code>.</p><p>
+exception for <code>n</code>-th element which would be <code>1f0</code>.</p><p>
 Default value for all transformation functions is <code>identity</code>.</p></div></div>
       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">calculate</code><code class="codex-lambda-list">(neural-network object)</code><div class="codex-docstring">Calculate the output from the network <code>neural-network</code> for the
 object <code>object</code>. The input transformation function is applied to the
