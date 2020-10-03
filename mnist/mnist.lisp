@@ -21,7 +21,8 @@
 (defun train-transform (digit)
   (declare (optimize (speed 3))
            (type (integer 0 9) digit))
-  (let ((vector (magicl:zeros
+  (let ((vector (magicl:const
+                 -1f0
                  '(10 1)
                  :type 'single-float)))
     (setf (magicl:tref vector digit 0) 1f0)

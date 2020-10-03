@@ -80,7 +80,7 @@ output column from the network."
     (flet ((calculate-layer (input weights-and-biases)
              (destructuring-bind (weights . biases)
                  weights-and-biases
-               (magicl:map! #'sigma
+               (magicl:map! #'tanh
                             (magicl:.+ (magicl:@ weights input)
                                        biases)))))
       (funcall
@@ -91,7 +91,7 @@ output column from the network."
 
 ;; Training
 (defun calculate-z-and-out (neural-network input)
-  "Calculate argument and value of sigma for all layers"
+  "Calculate argument and value of activation function for all layers"
   (declare (type neural-network neural-network)
            (type magicl:matrix/single-float input))
   (labels ((accumulate-z-and-out (weights biases input z-acc out-acc)
@@ -101,7 +101,7 @@ output column from the network."
                         (bias (car biases))
                         (bias-rest (cdr biases))
                         (z (magicl:.+ (magicl:@ weight input) bias))
-                        (out (magicl:map #'sigma z)))
+                        (out (magicl:map #'tanh z)))
                    (accumulate-z-and-out
                     weight-rest
                     bias-rest
@@ -129,7 +129,7 @@ output column from the network."
                    (backprop (cdr weight)
                              (cdr z)
                              (cons
-                              (magicl:.* (magicl:map #'sigma% z-l)
+                              (magicl:.* (magicl:map #'tanh% z-l)
                                          (magicl:mult w-l+1 delta-l+1 :transa :t))
                               acc)))
                  acc)))

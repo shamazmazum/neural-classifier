@@ -19,15 +19,8 @@
       (let ((n (pop acc)))
         (+ mean (* sigma n))))))
 
-(defun sigma (z)
-  "Function used to calculate the output from a neuron"
+(defun tanh% (z)
+  "The first derivative of tanh"
   (declare (optimize (speed 3))
            (type single-float z))
-  (/ (1+ (exp (- z)))))
-
-(defun sigma% (z)
-  "The first derivative of @c(sigma)."
-  (declare (optimize (speed 3))
-           (type single-float z))
-  (let ((sigma (sigma z)))
-    (* sigma (- 1f0 sigma))))
+  (expt (cosh z) -2))
