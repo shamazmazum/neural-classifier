@@ -21,8 +21,7 @@
 (defun train-transform (digit)
   (declare (optimize (speed 3))
            (type (integer 0 9) digit))
-  (let ((vector (magicl:const
-                 -1f0
+  (let ((vector (magicl:zeros
                  '(10 1)
                  :type 'single-float)))
     (setf (magicl:tref vector digit 0) 1f0)
@@ -117,7 +116,8 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
    (list #.(* 28 28) inner-neurons 10)
    :input-trans  #'possibly-invert
    :output-trans #'output-transform
-   :train-trans  #'train-transform))
+   :train-trans  #'train-transform
+   :activation-funcs '(:rlu :sigmoid)))
 
 (defun train-epoch (classifier)
   (neural-classifier:train-epoch
