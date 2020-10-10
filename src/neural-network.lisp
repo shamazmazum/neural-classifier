@@ -3,12 +3,21 @@
                    (debug 0)
                    (compilation-speed 0)))
 
-(defmacro make-neural-network (layout &key input-trans output-trans train-trans)
+(defmacro make-neural-network (layout &key
+                                        input-trans
+                                        output-trans
+                                        train-trans
+                                        activation-funcs)
   "Create a new neural network.
 
 
 @c(layout) is a list of positive integers which describes the amount
 of neurons in each layer (starting from input layer).
+
+
+@c(activation-funcs) is a list all the elements of which are either
+:sigmoid, :tanh or :rlu. The length of this list must be equal to the
+length of @c(layout) minus one. The last element cannot be :rlu.
 
 
 @c(input-trans) is a function which is applied to an object passed to
@@ -39,13 +48,15 @@ exception for @c(n)-th element which would be @c(1f0).
 Default value for all transformation functions is @c(identity)."
   `(make-instance 'neural-network
                   :layout ,layout
-                  ,@(if input-trans  `(:input-trans  ,input-trans))
-                  ,@(if output-trans `(:output-trans ,output-trans))
-                  ,@(if train-trans  `(:train-trans  ,train-trans))))
+                  ,@(if input-trans      `(:input-trans      ,input-trans))
+                  ,@(if output-trans     `(:output-trans     ,output-trans))
+                  ,@(if train-trans      `(:train-trans      ,train-trans))
+                  ,@(if activation-funcs `(:activation-funcs ,activation-funcs))))
 
 (defmethod initialize-instance :after ((neural-network neural-network) &rest initargs)
   (declare (ignore initargs))
-  (let ((layout (neural-network-layout neural-network)))
+  (let ((layout (neural-network-layout neural-network))
+        (activation-funcs (neural-network-activation-funcs neural-network)))
     (flet ((make-weight-matrix (rows columns)
              (magicl:rand (list rows columns)
                           :distribution (nrandom-generator
@@ -63,7 +74,16 @@ Default value for all transformation functions is @c(identity)."
                     (cdr layout) layout)
             (neural-network-biases neural-network)
             (mapcar #'make-bias-vector
-                    (cdr layout))))))
+                    (cdr layout))))
+
+    (let ((n (1- (length layout))))
+      (cond
+        ((null activation-funcs)
+         (setf (neural-network-activation-funcs neural-network)
+               (loop repeat n collect :tanh)))
+        ((or (/= (length activation-funcs) n)
+             (eq (car (last activation-funcs)) :rlu))
+         (error "Incorrect activation functions"))))))
 
 ;; Normal work
 (defun calculate (neural-network object)
@@ -74,19 +94,20 @@ output column from the network."
   (declare (type neural-network neural-network))
   (let ((weights (neural-network-weights neural-network))
         (biases  (neural-network-biases  neural-network))
+        (activation-funcs (neural-network-activation-funcs neural-network))
         (input-trans (neural-network-input-trans neural-network))
         (output-trans (neural-network-output-trans neural-network)))
     (declare (type function input-trans output-trans))
-    (flet ((calculate-layer (input weights-and-biases)
-             (destructuring-bind (weights . biases)
-                 weights-and-biases
-               (magicl:map! #'tanh
+    (flet ((calculate-layer (input layer)
+             (destructuring-bind (weights biases activation)
+                 layer
+               (magicl:map! (activation-fn activation)
                             (magicl:.+ (magicl:@ weights input)
                                        biases)))))
       (funcall
        output-trans
        (reduce #'calculate-layer
-               (mapcar #'cons weights biases)
+               (mapcar #'list weights biases activation-funcs)
                :initial-value (funcall input-trans object))))))
 
 ;; Training
@@ -94,48 +115,47 @@ output column from the network."
   "Calculate argument and value of activation function for all layers"
   (declare (type neural-network neural-network)
            (type magicl:matrix/single-float input))
-  (labels ((accumulate-z-and-out (weights biases input z-acc out-acc)
-             (if (and weights biases)
-                 (let* ((weight (car weights))
-                        (weight-rest (cdr weights))
-                        (bias (car biases))
-                        (bias-rest (cdr biases))
-                        (z (magicl:.+ (magicl:@ weight input) bias))
-                        (out (magicl:map #'tanh z)))
-                   (accumulate-z-and-out
-                    weight-rest
-                    bias-rest
-                    out
-                    (cons z z-acc)
-                    (cons out out-acc)))
+  (labels ((accumulate-z-and-out (layers input z-acc out-acc)
+             (if layers
+                 (destructuring-bind (weights biases activation)
+                     (car layers)
+                   (let* ((z (magicl:.+ (magicl:@ weights input) biases))
+                          (out (magicl:map (activation-fn activation) z)))
+                     (accumulate-z-and-out
+                      (cdr layers)
+                      out
+                      (cons z z-acc)
+                      (cons out out-acc))))
                  (values
                   z-acc
                   out-acc))))
     ;; Output is in backward order: input layer last
     (accumulate-z-and-out
-     (neural-network-weights neural-network)
-     (neural-network-biases neural-network)
+     (mapcar #'list
+             (neural-network-weights neural-network)
+             (neural-network-biases neural-network)
+             (neural-network-activation-funcs neural-network))
      input
      nil nil)))
 
 (defun calculate-delta (neural-network z network-output expected-output)
   "Calculate partial derivative of the cost function by z for all layers"
   (declare (type magicl:matrix/single-float expected-output))
-  (labels ((backprop (weight z acc)
-             (if z
-                 (let ((delta-l+1 (car acc))
-                       (z-l (car z))
-                       (w-l+1 (car weight)))
-                   (backprop (cdr weight)
-                             (cdr z)
+  (labels ((backprop (layer acc)
+             (if layer
+                 (destructuring-bind (w-l+1 activation-l z-l)
+                     (car layer)
+                   (backprop (cdr layer)
                              (cons
-                              (magicl:.* (magicl:map #'tanh% z-l)
-                                         (magicl:mult w-l+1 delta-l+1 :transa :t))
+                              (magicl:.* (magicl:map (activation-fn-derivative activation-l) z-l)
+                                         (magicl:mult w-l+1 (car acc) :transa :t))
                               acc)))
                  acc)))
     (backprop
-     (reverse (neural-network-weights neural-network))
-     (cdr z)
+     (mapcar #'list
+             (reverse (neural-network-weights neural-network))
+             (cdr (reverse (neural-network-activation-funcs neural-network)))
+             (cdr z))
      (list
       (magicl:.- network-output
                  expected-output)))))

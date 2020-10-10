@@ -1,10 +1,17 @@
 (in-package :neural-classifier)
 
+(declaim (ftype (function (activation-symbol)
+                          (values function &optional))
+                activation-fn activation-fn-derivative)
+         (type single-float +pi-single+)
+         (optimize (speed 3)))
+
 (defconstant +pi-single+ (float pi 0f0))
 
 (defun nrandom-generator (&key (sigma 1f0) (mean 0f0))
   "Create a generator which generates normally(mean, sigma) distributed values"
-  (declare (type single-float sigma mean))
+  (declare (type single-float sigma mean)
+           (optimize (speed 1)))
   (let (acc)
     (lambda ()
       (when (null acc)
@@ -19,8 +26,39 @@
       (let ((n (pop acc)))
         (+ mean (* sigma n))))))
 
-(defun tanh% (z)
-  "The first derivative of tanh"
-  (declare (optimize (speed 3))
-           (type single-float z))
-  (expt (cosh z) -2))
+;; Activation functions
+(defun sigma (z)
+  (declare (type single-float z))
+  (/ (1+ (exp (- z)))))
+
+(defun sigma-derivative (z)
+  (declare (type single-float z))
+  (let ((s (sigma z)))
+    (* s (- 1.0 s))))
+
+(defun tanh-derivative (z)
+  (declare (type single-float z))
+  (let ((t% (tanh z)))
+    (* (1+ t%) (- 1.0 t%))))
+
+(defun rlu (z)
+  (declare (type single-float z))
+  (abs z))
+
+(defun rlu-derivative (z)
+  (declare (type single-float z))
+  (signum z))
+
+(defun activation-fn (symbol)
+  (declare (type activation-symbol symbol))
+  (ecase symbol
+    (:sigmoid #'sigma)
+    (:tanh    #'tanh)
+    (:rlu     #'rlu)))
+
+(defun activation-fn-derivative (symbol)
+  (declare (type activation-symbol symbol))
+  (ecase symbol
+    (:sigmoid #'sigma-derivative)
+    (:tanh    #'tanh-derivative)
+    (:rlu     #'rlu-derivative)))
