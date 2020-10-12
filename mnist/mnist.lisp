@@ -122,13 +122,13 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
 (defun train-epoch (classifier)
   (neural-classifier:train-epoch
    classifier
-   (coerce (shuffle-vector *train-data*)
-           'list)))
+   (snakes:sequence->generator
+    (shuffle-vector *train-data*))))
 
 (defun rate (classifier vector)
   (neural-classifier:rate
    classifier
-   (coerce vector 'list)))
+   (snakes:sequence->generator vector)))
 
 (defun train-epochs (classifier n)
   "Train a neural network @c(classifier) for @c(n) epochs.

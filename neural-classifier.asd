@@ -11,7 +11,7 @@
                (:file "definitions")
                (:file "utility")
                (:file "neural-network"))
-  :depends-on (:magicl))
+  :depends-on (:magicl :snakes))
 
 (defsystem :neural-classifier/mnist
   :name :neural-classifier/mnist

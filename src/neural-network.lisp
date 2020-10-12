@@ -220,55 +220,59 @@ output column from the network."
         (setf weights (mapcar (improver *decay-rate*) weights delta-weight)
               biases  (mapcar (improver 0f0)          biases  delta-bias))))))
 
-(defun train-epoch (neural-network samples
+(defun train-epoch (neural-network generator
                     &key
                       (learn-rate *learn-rate*)
                       (decay-rate *decay-rate*)
                       (minibatch-size *minibatch-size*))
-  "Perform a training of @c(neural-network) on every object from the
-list @c(samples). Each item in @c(samples) must be a cons pair
-containing an object which is passed to the neural network and the
-expected output for that object (after the output transformation)."
+  "Perform a training of @c(neural-network) on every object returned
+by the generator @c(generator). Each item returned by @c(generator)
+must be a cons pair containing an object which is passed to the neural
+network and the expected output for that object (after the output
+transformation)."
   (declare (type single-float learn-rate decay-rate)
            (type neural-network neural-network)
            (type positive-fixnum minibatch-size)
-           (type list samples))
+           (type snakes:basic-generator generator))
   (let ((*learn-rate* learn-rate)
         (*decay-rate* decay-rate)
         (*minibatch-size* minibatch-size))
     (loop
-       for current-size = (min (length samples)
-                               *minibatch-size*)
-       for minibatch-samples = (subseq samples 0 current-size)
+       for minibatch-samples =
+         (snakes:take *minibatch-size* generator
+                      :fail-if-short nil)
        for i fixnum from 0 by *minibatch-size*
        while minibatch-samples
        do
          (learn neural-network minibatch-samples)
-         (setq samples (subseq samples current-size))
          (when (zerop (rem i 1000))
            (format *standard-output* "~d... " i)
            (force-output))
        finally (terpri))))
 
-(defun rate (neural-network samples &key (test #'eql))
+(defun rate (neural-network generator &key (test #'eql))
   "Calculate accuracy of the @c(neural-network) (that is a ratio of
 correctly guessed samples to all samples) using testing data from
-the list @c(samples). Each item in @c(samples) must be a cons pair
-containing an object which is passed to the network and the expected
-output for that object (after the output transformation). @c(test) is
-a function used to compare the expected output and the actual one."
-  (declare (type list samples)
+the generator @c(generator). Each item returned by @c(generator) must
+be a cons pair containing an object which is passed to the network and
+the expected output for that object (after the output
+transformation). @c(test) is a function used to compare the expected
+output and the actual one."
+  (declare (type snakes:basic-generator generator)
            (type function test))
-  (loop
-     for sample in samples
-     for input = (car sample)
-     for expected = (cdr sample)
-     count
-       (funcall test
-                (calculate neural-network input)
-                expected)
-     into positive
-     finally (return (float (/ positive (length samples))))))
+  (labels ((calculate-accuracy (hits total)
+             (declare (type fixnum hits total))
+             (let ((sample (funcall generator)))
+               (if (not (eq sample 'snakes:generator-stop))
+                   (calculate-accuracy
+                    (+ (if (funcall test
+                                    (calculate neural-network (car sample))
+                                    (cdr sample))
+                           1 0)
+                       hits)
+                    (1+ total))
+                   (float (/ hits total))))))
+    (calculate-accuracy 0 0)))
 
 #+sbcl
 (progn
