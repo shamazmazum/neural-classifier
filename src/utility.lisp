@@ -3,28 +3,15 @@
 (declaim (ftype (function (activation-symbol)
                           (values function &optional))
                 activation-fn activation-fn-derivative)
-         (type single-float +pi-single+)
          (optimize (speed 3)))
 
-(defconstant +pi-single+ (float pi 0f0))
-
-(defun nrandom-generator (&key (sigma 1f0) (mean 0f0))
-  "Create a generator which generates normally(mean, sigma) distributed values"
-  (declare (type single-float sigma mean)
-           (optimize (speed 1)))
-  (let (acc)
-    (lambda ()
-      (when (null acc)
-        (let* ((u1 (random 1f0))
-               (u2 (random 1f0))
-               (n1 (* (sqrt (* -2f0 (log u1)))
-                      (cos (* 2f0 +pi-single+ u2))))
-               (n2 (* (sqrt (* -2f0 (log u1)))
-                      (sin (* 2f0 +pi-single+ u2)))))
-          (push n1 acc)
-          (push n2 acc)))
-      (let ((n (pop acc)))
-        (+ mean (* sigma n))))))
+(defun random-normal (&key (mean 0f0) (sigma 0f0))
+  (declare (type single-float mean sigma))
+  (float
+   (cl-randist:random-normal
+    (float mean 0d0)
+    (float sigma 0d0))
+   0f0))
 
 ;; Activation functions
 (defun sigma (z)

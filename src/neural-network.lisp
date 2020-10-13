@@ -57,17 +57,18 @@ Default value for all transformation functions is @c(identity)."
   (declare (ignore initargs))
   (let ((layout (neural-network-layout neural-network))
         (activation-funcs (neural-network-activation-funcs neural-network)))
+    (declare (type list layout activation-funcs))
     (flet ((make-weight-matrix (rows columns)
              (magicl:rand (list rows columns)
-                          :distribution (nrandom-generator
-                                         :sigma (/
-                                                 (sqrt
-                                                  (the (single-float 0f0)
-                                                       (float columns 0f0)))))
+                          :distribution (lambda ()
+                                          (random-normal
+                                           :sigma
+                                           (/ (sqrt (the (single-float 0f0)
+                                                         (float columns 0f0))))))
                           :type 'single-float))
            (make-bias-vector (rows)
              (magicl:rand (list rows 1)
-                          :distribution (nrandom-generator)
+                          :distribution #'random-normal
                           :type 'single-float)))
       (setf (neural-network-weights neural-network)
             (mapcar #'make-weight-matrix
