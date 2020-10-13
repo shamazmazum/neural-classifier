@@ -3,11 +3,11 @@
                    (debug 0)
                    (compilation-speed 0)))
 
-(defmacro make-neural-network (layout &key
-                                        input-trans
-                                        output-trans
-                                        train-trans
-                                        activation-funcs)
+(defun make-neural-network (layout &key
+                                     input-trans
+                                     output-trans
+                                     train-trans
+                                     activation-funcs)
   "Create a new neural network.
 
 
@@ -46,12 +46,12 @@ exception for @c(n)-th element which would be @c(1f0).
 
 
 Default value for all transformation functions is @c(identity)."
-  `(make-instance 'neural-network
-                  :layout ,layout
-                  ,@(if input-trans      `(:input-trans      ,input-trans))
-                  ,@(if output-trans     `(:output-trans     ,output-trans))
-                  ,@(if train-trans      `(:train-trans      ,train-trans))
-                  ,@(if activation-funcs `(:activation-funcs ,activation-funcs))))
+  (let ((arguments
+         `(,@(if input-trans      `(:input-trans      ,input-trans))
+           ,@(if output-trans     `(:output-trans     ,output-trans))
+           ,@(if train-trans      `(:train-trans      ,train-trans))
+           ,@(if activation-funcs `(:activation-funcs ,activation-funcs)))))
+    (apply #'make-instance 'neural-network :layout layout arguments)))
 
 (defmethod initialize-instance :after ((neural-network neural-network) &rest initargs)
   (declare (ignore initargs))

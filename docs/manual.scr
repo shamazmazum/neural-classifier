@@ -39,7 +39,7 @@
    )
    @u(Functions)
    @cl:with-package[name="neural-classifier"](
-      @cl:doc(macro make-neural-network)
+      @cl:doc(function make-neural-network)
       @cl:doc(function calculate)
       @cl:doc(function train-epoch)
       @cl:doc(function rate)
