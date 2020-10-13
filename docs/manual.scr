@@ -14,15 +14,34 @@
       @item(Adjust @c(neural-classifier:*learn-rate*),
             @c(neural-classifier:*decay-rate*) and
             @c(neural-classifier:*minibatch-size*) parameters if you want.)
+      @item(Create a @c(snakes) generator which will return data for training in
+            the form @c((CONS SAMPLE LABEL)) (i.e. cons pair which contains a
+            sample for training and a label which describes that sample).)
+      @item(Create three functions: The first translates a sample returned by
+            the generator created in the previous step to
+            @c(magicl:matrix/single-float) matrix with dimensions @c(Nx1). The
+            second translates a label to @c(magicl:matrix/single-float) matrix
+            with dimensions @c(Mx1) and the third translates a matrix with
+            dimensions @c(Mx1)to a label. Obviously the second function is used
+            for training and the third is used for classifing objects with
+            trained net.)
       @item(Create a neural network with
-            @c(neural-classifier:make-neural-network).)
-      @item(Train neural network for @c(N) epochs with calling
-            @c(neural-classifier:train-epoch) @c(N) times. You can use
+            @c(neural-classifier:make-neural-network). The first parameter,
+            @c(layout), must be a list @c((N ... M)), where @c(N) and @c(M) are
+            taken from the previous step.)
+      @item(Train a neural network calling
+            @c(neural-classifier:train-epoch). An epoch is finished when
+            supplied generator doesn't have any more data (i.e. returns
+            @c(snakes:generator-stop)).)
+      @item(Repeat steps 2 and 5 to train for more epochs. You can use
             @c(neural-classifier:rate) function to control the accuracy of your
             network, so you know where to stop training.)
       @item(After the net is trained, call @c(neural-classifier:calculate) to
             pass your data through the net.)
    @end(enum)
+
+If you want an example, look at @c(mnist/mnist.lisp) to see how digit
+recognition works.
 @end(section)
 
 @begin(section)
