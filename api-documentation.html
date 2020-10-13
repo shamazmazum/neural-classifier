@@ -66,7 +66,7 @@ algorithm.</div></div>
    
    <u>Functions</u>
    
-      <div class="codex-doc-node codex-operator codex-macro"><code class="codex-name">make-neural-network</code><code class="codex-lambda-list">(layout &amp;key input-trans output-trans train-trans activation-funcs)</code><div class="codex-docstring"><p>Create a new neural network.</p><p>
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">make-neural-network</code><code class="codex-lambda-list">(layout &amp;key input-trans output-trans train-trans activation-funcs)</code><div class="codex-docstring"><p>Create a new neural network.</p><p>
 <code>layout</code> is a list of positive integers which describes the amount
 of neurons in each layer (starting from input layer).</p><p>
 <code>activation-funcs</code> is a list all the elements of which are either
@@ -96,16 +96,18 @@ Default value for all transformation functions is <code>identity</code>.</p></di
 object <code>object</code>. The input transformation function is applied to the
 <code>object</code> and the output transformation function is applied to the
 output column from the network.</div></div>
-      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">train-epoch</code><code class="codex-lambda-list">(neural-network samples &amp;key (learn-rate *learn-rate*) (decay-rate *decay-rate*) (minibatch-size *minibatch-size*))</code><div class="codex-docstring">Perform a training of <code>neural-network</code> on every object from the
-list <code>samples</code>. Each item in <code>samples</code> must be a cons pair
-containing an object which is passed to the neural network and the
-expected output for that object (after the output transformation).</div></div>
-      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">rate</code><code class="codex-lambda-list">(neural-network samples &amp;key (test (function eql)))</code><div class="codex-docstring">Calculate accuracy of the <code>neural-network</code>(that is a ratio of
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">train-epoch</code><code class="codex-lambda-list">(neural-network generator &amp;key (learn-rate *learn-rate*) (decay-rate *decay-rate*) (minibatch-size *minibatch-size*))</code><div class="codex-docstring">Perform a training of <code>neural-network</code> on every object returned
+by the generator <code>generator</code>. Each item returned by <code>generator</code>
+must be a cons pair containing an object which is passed to the neural
+network and the expected output for that object (after the output
+transformation).</div></div>
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">rate</code><code class="codex-lambda-list">(neural-network generator &amp;key (test (function eql)))</code><div class="codex-docstring">Calculate accuracy of the <code>neural-network</code>(that is a ratio of
 correctly guessed samples to all samples) using testing data from
-the list <code>samples</code>. Each item in <code>samples</code> must be a cons pair
-containing an object which is passed to the network and the expected
-output for that object (after the output transformation). <code>test</code> is
-a function used to compare the expected output and the actual one.</div></div>
+the generator <code>generator</code>. Each item returned by <code>generator</code> must
+be a cons pair containing an object which is passed to the network and
+the expected output for that object (after the output
+transformation). <code>test</code> is a function used to compare the expected
+output and the actual one.</div></div>
    
 
     </main>

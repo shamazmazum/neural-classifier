@@ -49,17 +49,31 @@
       <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
     </aside>
     <main class="codex-section">
-      
+      <p>
    Typical neural network lifecycle is the following:
-   <ol><li>Adjust <code>neural-classifier:*learn-rate*</code>,
+   </p><ol><li>Adjust <code>neural-classifier:*learn-rate*</code>,
             <code>neural-classifier:*decay-rate*</code> and
-            <code>neural-classifier:*minibatch-size*</code> parameters if you want.</li><li>Create a neural network with
-            <code>neural-classifier:make-neural-network</code>.</li><li>Train neural network for <code>N</code> epochs with calling
-            <code>neural-classifier:train-epoch</code><code>N</code> times. You can use
+            <code>neural-classifier:*minibatch-size*</code> parameters if you want.</li><li>Create a <code>snakes</code> generator which will return data for training in
+            the form <code>(CONS SAMPLE LABEL)</code>(i.e. cons pair which contains a
+            sample for training and a label which describes that sample).</li><li>Create three functions: The first translates a sample returned by
+            the generator created in the previous step to
+            <code>magicl:matrix/single-float</code> matrix with dimensions <code>Nx1</code>. The
+            second translates a label to <code>magicl:matrix/single-float</code> matrix
+            with dimensions <code>Mx1</code> and the third translates a matrix with
+            dimensions <code>Mx1</code>to a label. Obviously the second function is used
+            for training and the third is used for classifing objects with
+            trained net.</li><li>Create a neural network with
+            <code>neural-classifier:make-neural-network</code>. The first parameter,
+            <code>layout</code>, must be a list <code>(N ... M)</code>, where <code>N</code> and <code>M</code> are
+            taken from the previous step.</li><li>Train a neural network calling
+            <code>neural-classifier:train-epoch</code>. An epoch is finished when
+            supplied generator doesn't have any more data (i.e. returns
+            <code>snakes:generator-stop</code>).</li><li>Repeat steps 2 and 5 to train for more epochs. You can use
             <code>neural-classifier:rate</code> function to control the accuracy of your
             network, so you know where to stop training.</li><li>After the net is trained, call <code>neural-classifier:calculate</code> to
-            pass your data through the net.</li></ol>
-
+            pass your data through the net.</li></ol><p>If you want an example, look at <code>mnist/mnist.lisp</code> to see how digit
+recognition works.
+</p>
     </main>
   </article>
   <footer>
