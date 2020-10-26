@@ -14,21 +14,26 @@
       @item(Adjust @c(neural-classifier:*learn-rate*),
             @c(neural-classifier:*decay-rate*) and
             @c(neural-classifier:*minibatch-size*) parameters if you want.)
-      @item(Create a @c(snakes) generator which will return data for training in
-            the form @c((CONS SAMPLE LABEL)) (i.e. cons pair which contains a
-            sample for training and a label which describes that sample).)
-      @item(Create three functions: The first translates a sample returned by
-            the generator created in the previous step to
-            @c(magicl:matrix/single-float) matrix with dimensions @c(Nx1). The
-            second translates a label to @c(magicl:matrix/single-float) matrix
-            with dimensions @c(Mx1) and the third translates a matrix with
-            dimensions @c(Mx1)to a label. Obviously the second function is used
-            for training and the third is used for classifing objects with
-            trained net.)
+      @item(Create a @c(snakes) generator which will return data for the
+            training step in the form @c((CONS SAMPLE LABEL)) (i.e. cons pair
+            which contains a sample for training and a label which describes
+            that sample).)
+      @item(Create four functions: The first and the second translate a sample
+            returned by the generator created in the previous step to
+            @c(magicl:matrix/single-float) matrix with dimensions @c(Nx1). One
+            of them will be used by @c(calculate) and another one will be used
+            during the training. The function used for training may make
+            additional random transformations of the input data to extend
+            training set. The third translates a label to
+            @c(magicl:matrix/single-float) matrix with dimensions @c(Mx1) and
+            the fourth translates a matrix with dimensions @c(Mx1)to a label.
+            Obviously the third function is used for training and the
+            fourth is used for classifing objects with trained net.)
       @item(Create a neural network with
             @c(neural-classifier:make-neural-network). The first parameter,
             @c(layout), must be a list @c((N ... M)), where @c(N) and @c(M) are
-            taken from the previous step.)
+            taken from the previous step. Also is accepts created transformation
+            functions.)
       @item(Train a neural network calling
             @c(neural-classifier:train-epoch). An epoch is finished when
             supplied generator doesn't have any more data (i.e. returns

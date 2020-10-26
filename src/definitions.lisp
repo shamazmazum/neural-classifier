@@ -23,17 +23,23 @@
                      :initarg       :input-trans
                      :initform      #'identity
                      :accessor      neural-network-input-trans
-                     :documentation "Function which translates input object to a vector")
+                     :documentation "Function which translates an input object to a vector")
    (output-trans     :type          function
                      :initarg       :output-trans
                      :initform      #'identity
                      :accessor      neural-network-output-trans
-                     :documentation "Function which translates output vector to some object.")
-   (train-trans      :type          function
-                     :initarg       :train-trans
+                     :documentation "Function which translates an output vector to a label.")
+   (input-trans%     :type          function
+                     :initarg       :input-trans%
                      :initform      #'identity
-                     :accessor      neural-network-train-trans
-                     :documentation "Function which translates expected object to output vector"))
+                     :accessor      neural-network-input-trans%
+                     :documentation "Function which translates an input object to a vector
+(used for training)")
+   (label-trans      :type          function
+                     :initarg       :label-trans
+                     :initform      #'identity
+                     :accessor      neural-network-label-trans
+                     :documentation "Function which translates a label to a vector"))
   (:documentation "Class for neural networks"))
 
 (deftype non-negative-fixnum () '(integer 0 #.most-positive-fixnum))

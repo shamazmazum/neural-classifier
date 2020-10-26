@@ -6,7 +6,8 @@
 (defun make-neural-network (layout &key
                                      input-trans
                                      output-trans
-                                     train-trans
+                                     input-trans%
+                                     label-trans
                                      activation-funcs)
   "Create a new neural network.
 
@@ -16,8 +17,9 @@ of neurons in each layer (starting from input layer).
 
 
 @c(activation-funcs) is a list all the elements of which are either
-:sigmoid, :tanh or :rlu. The length of this list must be equal to the
-length of @c(layout) minus one. The last element cannot be :rlu.
+@c(:sigmoid), @c(:tanh) or @c(:rlu). The length of this list must be
+equal to the length of @c(layout) minus one. The last element cannot
+be @c(:rlu).
 
 
 @c(input-trans) is a function which is applied to an object passed to
@@ -32,24 +34,31 @@ number of an image in the set and return @c(784x1) matrix.
 @c(calculate) function (that is a matrix with the type
 @c(magicl:matrix/single-float) and the shape Mx1, where M is the last
 number in the @c(layout)) to return some object with user-defined
-meaning. Again, if we are recognizing digits, this function transforms
-@c(10x1) matrix to a number from 0 to 9.
+meaning (called a label). Again, if we are recognizing digits, this
+function transforms @c(10x1) matrix to a number from 0 to 9.
 
 
-@c(train-trans) is a function which is applied to an object from the
-train set to get a column (that is a matrix with the type
-@c(magicl:matrix/single-float) and the shape @c(Mx1), where @c(M) is
-the last number in the @c(layout)) which is optimal output from the
-network for this object. With digits recognition, this function may
-take a digit @c(n) and return @c(10x1) matrix of all zeros with
-exception for @c(n)-th element which would be @c(1f0).
+@c(input-trans%) is just like @c(input-trans), but is used while
+training. It can include additional transformations to extend your
+training set (e.g. it can add some noise to resulting vector, rotate a
+picture by a small random angle, etc.).
+
+
+@c(label-trans) is a function which is applied to a label to get a
+column (that is a matrix with the type @c(magicl:matrix/single-float)
+and the shape @c(Mx1), where @c(M) is the last number in the
+@c(layout)) which is optimal output from the network for this
+object. With digits recognition, this function may take a digit @c(n)
+and return @c(10x1) matrix of all zeros with exception for @c(n)-th
+element which would be @c(1f0).
 
 
 Default value for all transformation functions is @c(identity)."
   (let ((arguments
          `(,@(if input-trans      `(:input-trans      ,input-trans))
            ,@(if output-trans     `(:output-trans     ,output-trans))
-           ,@(if train-trans      `(:train-trans      ,train-trans))
+           ,@(if input-trans%     `(:input-trans%     ,input-trans%))
+           ,@(if label-trans      `(:label-trans      ,label-trans))
            ,@(if activation-funcs `(:activation-funcs ,activation-funcs)))))
     (apply #'make-instance 'neural-network :layout layout arguments)))
 
@@ -165,10 +174,10 @@ output column from the network."
   "Calculate gradient of the cost function"
   (declare (type cons sample))
   (let ((input    (funcall
-                   (the function (neural-network-input-trans neural-network))
+                   (the function (neural-network-input-trans% neural-network))
                    (car sample)))
         (expected (funcall
-                   (the function (neural-network-train-trans neural-network))
+                   (the function (neural-network-label-trans neural-network))
                    (cdr sample))))
     (declare (type magicl:matrix/single-float input expected))
     (multiple-value-bind (z output)
@@ -229,8 +238,9 @@ output column from the network."
   "Perform a training of @c(neural-network) on every object returned
 by the generator @c(generator). Each item returned by @c(generator)
 must be a cons pair containing an object which is passed to the neural
-network and the expected output for that object (after the output
-transformation)."
+network and its label. @c(input-trans%) and @c(label-trans) functions
+passed to @c(make-neural-network) are applied to @c(car) and @c(cdr)
+of each cons pair."
   (declare (type single-float learn-rate decay-rate)
            (type neural-network neural-network)
            (type positive-fixnum minibatch-size)
@@ -256,9 +266,8 @@ transformation)."
 correctly guessed samples to all samples) using testing data from
 the generator @c(generator). Each item returned by @c(generator) must
 be a cons pair containing an object which is passed to the network and
-the expected output for that object (after the output
-transformation). @c(test) is a function used to compare the expected
-output and the actual one."
+its label. @c(test) is a function used to compare the expected label
+and the actual one."
   (declare (type snakes:basic-generator generator)
            (type function test))
   (labels ((calculate-accuracy (hits total)

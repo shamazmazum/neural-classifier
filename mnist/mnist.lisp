@@ -18,7 +18,7 @@
     (declare (type list output%))
     (position max output%)))
 
-(defun train-transform (digit)
+(defun label-transform (digit)
   (declare (optimize (speed 3))
            (type (integer 0 9) digit))
   (let ((vector (magicl:zeros
@@ -114,9 +114,9 @@
 dataset. @c(inner-neurons) is a number of neurons in the inner layer."
   (neural-classifier:make-neural-network
    (list #.(* 28 28) inner-neurons 10)
-   :input-trans  #'possibly-invert
-   :output-trans #'output-transform
-   :train-trans  #'train-transform
+   :input-trans%  #'possibly-invert
+   :output-trans  #'output-transform
+   :label-trans   #'label-transform
    :activation-funcs '(:rlu :sigmoid)))
 
 (defun train-epoch (classifier)
