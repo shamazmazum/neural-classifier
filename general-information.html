@@ -53,19 +53,24 @@
    Typical neural network lifecycle is the following:
    </p><ol><li>Adjust <code>neural-classifier:*learn-rate*</code>,
             <code>neural-classifier:*decay-rate*</code> and
-            <code>neural-classifier:*minibatch-size*</code> parameters if you want.</li><li>Create a <code>snakes</code> generator which will return data for training in
-            the form <code>(CONS SAMPLE LABEL)</code>(i.e. cons pair which contains a
-            sample for training and a label which describes that sample).</li><li>Create three functions: The first translates a sample returned by
-            the generator created in the previous step to
-            <code>magicl:matrix/single-float</code> matrix with dimensions <code>Nx1</code>. The
-            second translates a label to <code>magicl:matrix/single-float</code> matrix
-            with dimensions <code>Mx1</code> and the third translates a matrix with
-            dimensions <code>Mx1</code>to a label. Obviously the second function is used
-            for training and the third is used for classifing objects with
-            trained net.</li><li>Create a neural network with
+            <code>neural-classifier:*minibatch-size*</code> parameters if you want.</li><li>Create a <code>snakes</code> generator which will return data for the
+            training step in the form <code>(CONS SAMPLE LABEL)</code>(i.e. cons pair
+            which contains a sample for training and a label which describes
+            that sample).</li><li>Create four functions: The first and the second translate a sample
+            returned by the generator created in the previous step to
+            <code>magicl:matrix/single-float</code> matrix with dimensions <code>Nx1</code>. One
+            of them will be used by <code>calculate</code> and another one will be used
+            during the training. The function used for training may make
+            additional random transformations of the input data to extend
+            training set. The third translates a label to
+            <code>magicl:matrix/single-float</code> matrix with dimensions <code>Mx1</code> and
+            the fourth translates a matrix with dimensions <code>Mx1</code>to a label.
+            Obviously the third function is used for training and the
+            fourth is used for classifing objects with trained net.</li><li>Create a neural network with
             <code>neural-classifier:make-neural-network</code>. The first parameter,
             <code>layout</code>, must be a list <code>(N ... M)</code>, where <code>N</code> and <code>M</code> are
-            taken from the previous step.</li><li>Train a neural network calling
+            taken from the previous step. Also is accepts created transformation
+            functions.</li><li>Train a neural network calling
             <code>neural-classifier:train-epoch</code>. An epoch is finished when
             supplied generator doesn't have any more data (i.e. returns
             <code>snakes:generator-stop</code>).</li><li>Repeat steps 2 and 5 to train for more epochs. You can use
