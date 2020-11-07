@@ -14,6 +14,17 @@
      1)
     copy))
 
+(defmethod ./ ((source1 matrix/single-float)
+               (source2 single-float)
+               &optional target)
+  (let ((copy (or target (deep-copy-tensor source1))))
+    (magicl.blas-cffi:%sscal
+     (size source1)
+     (/ source2)
+     (storage copy)
+     1)
+    copy))
+
 ;; Matrix addition
 (defmethod .+ ((source1 matrix/single-float)
                (source2 matrix/single-float)
@@ -51,3 +62,14 @@
    function
    (storage tensor))
   tensor)
+
+(defgeneric sasum (tensor)
+  (:documentation "Sum of absolute values"))
+
+(defmethod sasum ((matrix matrix/single-float))
+  (magicl.blas-cffi:%sasum
+   (size matrix)
+   (storage matrix)
+   1))
+
+(export '(sasum))

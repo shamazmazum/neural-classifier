@@ -36,16 +36,28 @@
   (declare (type single-float z))
   (signum z))
 
+(defun softmax (v)
+  (declare (type magicl:matrix/single-float v))
+  (let ((v% (magicl:map #'exp v)))
+    (magicl:./ v%
+               (magicl:sasum v%))))
+
+(defun softmax-derivative (z)
+  (declare (ignore z))
+  (error "Why I am here?"))
+
 (defun activation-fn (symbol)
   (declare (type activation-symbol symbol))
   (ecase symbol
-    (:sigmoid #'sigma)
-    (:tanh    #'tanh)
-    (:rlu     #'rlu)))
+    (:sigmoid (lambda (v) (magicl:map #'sigma v)))
+    (:tanh    (lambda (v) (magicl:map #'tanh v)))
+    (:rlu     (lambda (v) (magicl:map #'rlu v)))
+    (:softmax #'softmax)))
 
 (defun activation-fn-derivative (symbol)
   (declare (type activation-symbol symbol))
   (ecase symbol
-    (:sigmoid #'sigma-derivative)
-    (:tanh    #'tanh-derivative)
-    (:rlu     #'rlu-derivative)))
+    (:sigmoid (lambda (v) (magicl:map #'sigma-derivative v)))
+    (:tanh    (lambda (v) (magicl:map #'tanh-derivative v)))
+    (:rlu     (lambda (v) (magicl:map #'rlu-derivative v)))
+    (:softmax #'softmax-derivative)))

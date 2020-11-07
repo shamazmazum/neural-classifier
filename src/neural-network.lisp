@@ -17,9 +17,10 @@ of neurons in each layer (starting from input layer).
 
 
 @c(activation-funcs) is a list all the elements of which are either
-@c(:sigmoid), @c(:tanh) or @c(:rlu). The length of this list must be
-equal to the length of @c(layout) minus one. The last element cannot
-be @c(:rlu).
+@c(:sigmoid), @c(:tanh), @c(:rlu) or @c(:softmax). The length of this
+list must be equal to the length of @c(layout) minus one. The last
+element cannot be @c(:rlu). @c(:softmax) can be only the last
+element.
 
 
 @c(input-trans) is a function which is applied to an object passed to
@@ -92,7 +93,8 @@ Default value for all transformation functions is @c(identity)."
          (setf (neural-network-activation-funcs neural-network)
                (loop repeat n collect :tanh)))
         ((or (/= (length activation-funcs) n)
-             (eq (car (last activation-funcs)) :rlu))
+             (eq (car (last activation-funcs)) :rlu)
+             (find :softmax (butlast activation-funcs)))
          (error "Incorrect activation functions"))))))
 
 ;; Normal work
@@ -111,9 +113,9 @@ output column from the network."
     (flet ((calculate-layer (input layer)
              (destructuring-bind (weights biases activation)
                  layer
-               (magicl:map! (activation-fn activation)
-                            (magicl:.+ (magicl:@ weights input)
-                                       biases)))))
+               (funcall (activation-fn activation)
+                        (magicl:.+ (magicl:@ weights input)
+                                   biases)))))
       (funcall
        output-trans
        (reduce #'calculate-layer
@@ -130,7 +132,7 @@ output column from the network."
                  (destructuring-bind (weights biases activation)
                      (car layers)
                    (let* ((z (magicl:.+ (magicl:@ weights input) biases))
-                          (out (magicl:map (activation-fn activation) z)))
+                          (out (funcall (activation-fn activation) z)))
                      (accumulate-z-and-out
                       (cdr layers)
                       out
@@ -157,7 +159,7 @@ output column from the network."
                      (car layer)
                    (backprop (cdr layer)
                              (cons
-                              (magicl:.* (magicl:map (activation-fn-derivative activation-l) z-l)
+                              (magicl:.* (funcall (activation-fn-derivative activation-l) z-l)
                                          (magicl:mult w-l+1 (car acc) :transa :t))
                               acc)))
                  acc)))
