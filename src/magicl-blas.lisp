@@ -5,8 +5,7 @@
 (defmethod .* ((source1 single-float)
                (source2 matrix/single-float)
                &optional target)
-  (declare (ignore target))
-  (let ((copy (deep-copy-tensor source2)))
+  (let ((copy (or target (deep-copy-tensor source2))))
     (magicl.blas-cffi:%sscal
      (size source2)
      source1
@@ -29,11 +28,10 @@
 (defmethod .+ ((source1 matrix/single-float)
                (source2 matrix/single-float)
                &optional target)
-  (declare (ignore target))
   (policy-cond:with-expectations (> speed safety)
       ((assertion (equalp (shape source1)
                           (shape source2)))))
-  (let ((copy (deep-copy-tensor source2)))
+  (let ((copy (or target (deep-copy-tensor source2))))
     (magicl.blas-cffi:%saxpy
      (size source2)
      1f0
@@ -44,11 +42,10 @@
 (defmethod .- ((source1 matrix/single-float)
                (source2 matrix/single-float)
                &optional target)
-  (declare (ignore target))
   (policy-cond:with-expectations (> speed safety)
       ((assertion (equalp (shape source1)
                           (shape source2)))))
-  (let ((copy (deep-copy-tensor source1)))
+  (let ((copy (or target (deep-copy-tensor source1))))
     (magicl.blas-cffi:%saxpy
      (size source2)
      -1f0
