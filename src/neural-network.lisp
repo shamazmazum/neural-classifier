@@ -200,7 +200,9 @@ output column from the network."
   (flet ((sum-matrices (matrices1 matrices2)
            (declare (type list matrices1 matrices2))
            (mapcar #'magicl:.+
-                   matrices1 matrices2)))
+                   matrices1
+                   matrices2
+                   matrices2)))
     (loop
        with weights = nil
        with biases = nil
