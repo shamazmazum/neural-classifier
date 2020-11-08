@@ -6,10 +6,14 @@
            #:neural-network-output-trans
            #:neural-network-input-trans%
            #:neural-network-label-trans
+
            #:make-neural-network
            #:calculate
+           #:train-epoch
+           #:rate
+
+           #:idx-abs-max
+
            #:*learn-rate*
            #:*decay-rate*
-           #:*minibatch-size*
-           #:train-epoch
-           #:rate))
+           #:*minibatch-size*))

@@ -10,22 +10,20 @@
 (defconstant +image-magic+ 2051)
 (defconstant +label-magic+ 2049)
 
-(defun output-transform (output)
-  (declare (optimize (speed 3))
-           (type magicl:matrix/single-float output))
-  (let* ((output% (loop for i below 10 collect (magicl:tref output i 0)))
-         (max (reduce #'max output%)))
-    (declare (type list output%))
-    (position max output%)))
+(defvar *labels*
+  (make-array
+   10
+   :initial-contents
+   (loop
+      for i below 10
+      for v = (magicl:zeros '(10 1) :type 'single-float)
+      do (setf (magicl:tref v i 0) 1.0)
+      collect v)))
 
 (defun label-transform (digit)
   (declare (optimize (speed 3))
            (type (integer 0 9) digit))
-  (let ((vector (magicl:zeros
-                 '(10 1)
-                 :type 'single-float)))
-    (setf (magicl:tref vector digit 0) 1f0)
-    vector))
+  (svref *labels* digit))
 
 (defun read-labels (which)
   (let ((name (ecase which
@@ -115,7 +113,7 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
   (neural-classifier:make-neural-network
    (list #.(* 28 28) inner-neurons 10)
    :input-trans%  #'possibly-invert
-   :output-trans  #'output-transform
+   :output-trans  #'neural-classifier:idx-abs-max
    :label-trans   #'label-transform
    :activation-funcs '(:rlu :softmax)))
 

@@ -67,5 +67,6 @@ recognition works.
       @cl:doc(function calculate)
       @cl:doc(function train-epoch)
       @cl:doc(function rate)
+      @cl:doc(function idx-abs-max)
    )
 @end(section)
