@@ -71,9 +71,10 @@ algorithm.</div></div>
 <code>layout</code> is a list of positive integers which describes the amount
 of neurons in each layer (starting from input layer).</p><p>
 <code>activation-funcs</code> is a list all the elements of which are either
-<code>:sigmoid</code>, <code>:tanh</code> or <code>:rlu</code>. The length of this list must be
-equal to the length of <code>layout</code> minus one. The last element cannot
-be <code>:rlu</code>.</p><p>
+<code>:sigmoid</code>, <code>:tanh</code>, <code>:rlu</code> or <code>:softmax</code>. The length of this
+list must be equal to the length of <code>layout</code> minus one. The last
+element cannot be <code>:rlu</code>. <code>:softmax</code> can be only the last
+element.</p><p>
 <code>input-trans</code> is a function which is applied to an object passed to
 <code>calculate</code> to transform it into an input column (that is a matrix
 with the type <code>magicl:matrix/single-float</code> and the shape <code>Nx1</code>,
@@ -114,6 +115,9 @@ the generator <code>generator</code>. Each item returned by <code>generator</cod
 be a cons pair containing an object which is passed to the network and
 its label. <code>test</code> is a function used to compare the expected label
 and the actual one.</div></div>
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">idx-abs-max</code><code class="codex-lambda-list">(matrix)</code><div class="codex-docstring">Returns index of first element with maximal absolute value by
+  calling isamax() function from BLAS. Works only for rows or
+  columns.</div></div>
    
 
     </main>
