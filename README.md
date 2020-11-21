@@ -1,5 +1,5 @@
 # Neural-classifier
-[![Build Status](https://travis-ci.com/shamazmazum/neural-classifier.svg?branch=master)](https://travis-ci.com/shamazmazum/neural-classifier)
+[![Build Status](https://api.cirrus-ci.com/github/shamazmazum/neural-classifier.svg)](https://cirrus-ci.com/github/shamazmazum/neural-classifier)
 
 `neural-classifier` is a neural network library based on the first chapters
 from [this book](http://neuralnetworksanddeeplearning.com/). It is divided on
