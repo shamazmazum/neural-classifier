@@ -17,10 +17,10 @@ of neurons in each layer (starting from input layer).
 
 
 @c(activation-funcs) is a list all the elements of which are either
-@c(:sigmoid), @c(:tanh), @c(:rlu) or @c(:softmax). The length of this
-list must be equal to the length of @c(layout) minus one. The last
-element cannot be @c(:rlu). @c(:softmax) can be only the last
-element.
+@c(:sigmoid), @c(:tanh), @c(:abs), @c(:relu) or @c(:softmax). The
+length of this list must be equal to the length of @c(layout) minus
+one. The last element cannot be @c(:abs) or @c(:relu). @c(:softmax)
+can be only the last element.
 
 
 @c(input-trans) is a function which is applied to an object passed to
@@ -93,7 +93,8 @@ Default value for all transformation functions is @c(identity)."
          (setf (neural-network-activation-funcs neural-network)
                (loop repeat n collect :tanh)))
         ((or (/= (length activation-funcs) n)
-             (eq (car (last activation-funcs)) :rlu)
+             (eq (car (last activation-funcs)) :abs)
+             (eq (car (last activation-funcs)) :relu)
              (find :softmax (butlast activation-funcs)))
          (error "Incorrect activation functions"))))))
 

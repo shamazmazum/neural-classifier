@@ -28,13 +28,21 @@
   (let ((t% (tanh z)))
     (* (1+ t%) (- 1.0 t%))))
 
-(defun rlu (z)
+(defun abs-fn (z)
   (declare (type single-float z))
   (abs z))
 
-(defun rlu-derivative (z)
+(defun abs-derivative (z)
   (declare (type single-float z))
   (signum z))
+
+(defun relu (z)
+  (declare (type single-float z))
+  (max 0.0 z))
+
+(defun relu-derivative (z)
+  (declare (type single-float z))
+  (max (signum z) 0.0))
 
 (defun softmax (v)
   (declare (type magicl:matrix/single-float v))
@@ -51,7 +59,8 @@
   (ecase symbol
     (:sigmoid (lambda (v) (magicl:map #'sigma v)))
     (:tanh    (lambda (v) (magicl:map #'tanh v)))
-    (:rlu     (lambda (v) (magicl:map #'rlu v)))
+    (:abs     (lambda (v) (magicl:map #'abs-fn v)))
+    (:relu    (lambda (v) (magicl:map #'relu v)))
     (:softmax #'softmax)))
 
 (defun activation-fn-derivative (symbol)
@@ -59,7 +68,8 @@
   (ecase symbol
     (:sigmoid (lambda (v) (magicl:map #'sigma-derivative v)))
     (:tanh    (lambda (v) (magicl:map #'tanh-derivative v)))
-    (:rlu     (lambda (v) (magicl:map #'rlu-derivative v)))
+    (:abs     (lambda (v) (magicl:map #'abs-derivative v)))
+    (:relu    (lambda (v) (magicl:map #'relu-derivative v)))
     (:softmax #'softmax-derivative)))
 
 (defun idx-abs-max (matrix)
