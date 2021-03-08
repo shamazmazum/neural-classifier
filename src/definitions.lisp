@@ -1,6 +1,7 @@
 (in-package :neural-classifier)
 
-(deftype activation-symbol () '(member :sigmoid :tanh :rlu :softmax))
+(deftype activation-symbol ()
+  '(member :sigmoid :tanh :abs :relu :softmax))
 
 (defclass neural-network ()
   ((layout           :initarg       :layout
