@@ -71,10 +71,10 @@ algorithm.</div></div>
 <code>layout</code> is a list of positive integers which describes the amount
 of neurons in each layer (starting from input layer).</p><p>
 <code>activation-funcs</code> is a list all the elements of which are either
-<code>:sigmoid</code>, <code>:tanh</code>, <code>:rlu</code> or <code>:softmax</code>. The length of this
-list must be equal to the length of <code>layout</code> minus one. The last
-element cannot be <code>:rlu</code>. <code>:softmax</code> can be only the last
-element.</p><p>
+<code>:sigmoid</code>, <code>:tanh</code>, <code>:abs</code>, <code>:relu</code> or <code>:softmax</code>. The
+length of this list must be equal to the length of <code>layout</code> minus
+one. The last element cannot be <code>:abs</code> or <code>:relu</code>. <code>:softmax</code>
+can be only the last element.</p><p>
 <code>input-trans</code> is a function which is applied to an object passed to
 <code>calculate</code> to transform it into an input column (that is a matrix
 with the type <code>magicl:matrix/single-float</code> and the shape <code>Nx1</code>,
