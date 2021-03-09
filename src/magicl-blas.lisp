@@ -1,11 +1,27 @@
 ;; These methods optimize matrix operation functions from magicl using BLAS.
 
 (in-package :magicl)
+(defun copy-matrix (source &optional target)
+  (declare (optimize (speed 3))
+           (type matrix/single-float source)
+           (type (or matrix/single-float null) target))
+  (cond
+    ((eq source target)
+     target)
+    (target
+     (let ((storage-t (storage target))
+           (storage-s (storage source)))
+       (declare (type (simple-array single-float) storage-s storage-t))
+       (map-into storage-t #'identity storage-s)
+       target))
+    (t
+      (deep-copy-tensor source))))
+
 ;; Scalar - matrix multiplication
 (defmethod .* ((source1 single-float)
                (source2 matrix/single-float)
                &optional target)
-  (let ((copy (or target (deep-copy-tensor source2))))
+  (let ((copy (copy-matrix source2 target)))
     (magicl.blas-cffi:%sscal
      (size source2)
      source1
@@ -16,7 +32,7 @@
 (defmethod ./ ((source1 matrix/single-float)
                (source2 single-float)
                &optional target)
-  (let ((copy (or target (deep-copy-tensor source1))))
+  (let ((copy (copy-matrix source1 target)))
     (magicl.blas-cffi:%sscal
      (size source1)
      (/ source2)
@@ -31,13 +47,16 @@
   (policy-cond:with-expectations (> speed safety)
       ((assertion (equalp (shape source1)
                           (shape source2)))))
-  (let ((copy (or target (deep-copy-tensor source2))))
+  (let ((source1 (if (eq target source1)
+                     (deep-copy-tensor source1)
+                     source1))
+        (source2 (copy-matrix source2 target)))
     (magicl.blas-cffi:%saxpy
      (size source2)
      1f0
      (storage source1) 1
-     (storage copy) 1)
-    copy))
+     (storage source2) 1)
+    source2))
 
 (defmethod .- ((source1 matrix/single-float)
                (source2 matrix/single-float)
@@ -45,13 +64,16 @@
   (policy-cond:with-expectations (> speed safety)
       ((assertion (equalp (shape source1)
                           (shape source2)))))
-  (let ((copy (or target (deep-copy-tensor source1))))
+  (let ((source2 (if (eq target source2)
+                     (deep-copy-tensor source2)
+                     source2))
+        (source1 (copy-matrix  source1 target)))
     (magicl.blas-cffi:%saxpy
      (size source2)
      -1f0
      (storage source2) 1
-     (storage copy) 1)
-    copy))
+     (storage source1) 1)
+    source1))
 
 (defmethod map! ((function function) (tensor matrix))
   (map-into
@@ -70,3 +92,15 @@
    1))
 
 (export '(sasum))
+
+(define-compiler-macro .+ (&whole form source1 source2 &optional target)
+  (declare (ignore source2))
+  (when (eq source1 target)
+    (warn "Inefficient use of .+: ~a" form))
+  form)
+
+(define-compiler-macro .- (&whole form source1 source2 &optional target)
+  (declare (ignore source1))
+  (when (eq source2 target)
+    (warn "Inefficient use of .+: ~a" form))
+  form)
