@@ -12,6 +12,7 @@
                (:file "magicl-blas")
                (:file "definitions")
                (:file "utility")
+               (:file "optimizers")
                (:file "neural-network"))
   :depends-on (:magicl :snakes :cl-randist))
 

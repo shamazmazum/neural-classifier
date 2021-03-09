@@ -14,6 +14,10 @@
 
            #:idx-abs-max
 
+           #:make-sgd-optimizer
+           #:make-momentum-optimizer
+
+           #:*momentum-coeff*
            #:*learn-rate*
            #:*decay-rate*
            #:*minibatch-size*))

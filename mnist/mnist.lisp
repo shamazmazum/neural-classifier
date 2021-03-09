@@ -121,7 +121,8 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
   (neural-classifier:train-epoch
    classifier
    (snakes:sequence->generator
-    (shuffle-vector *train-data*))))
+    (shuffle-vector *train-data*))
+   :optimizer (neural-classifier:make-momentum-optimizer classifier)))
 
 (defun rate (classifier vector)
   (neural-classifier:rate

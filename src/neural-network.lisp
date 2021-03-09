@@ -220,24 +220,46 @@ output column from the network."
             (reduce #'sum-matrices weights)
             (reduce #'sum-matrices biases))))))
 
-(defun learn (neural-network samples)
-  (multiple-value-bind (delta-weight delta-bias)
-      (calculate-gradient-minibatch neural-network samples)
-    (flet ((improver (decay)
-             (declare (type single-float decay))
-             (lambda (x delta-x)
-               (declare (type magicl:matrix/single-float x delta-x))
-               (magicl:.-
-                (magicl:.* (- 1f0 (* *learn-rate* decay)) x)
-                (magicl:.* (/ *learn-rate* *minibatch-size*) delta-x)))))
-      (with-accessors ((weights neural-network-weights)
-                       (biases  neural-network-biases))
-          neural-network
-        (setf weights (mapcar (improver *decay-rate*) weights delta-weight)
-              biases  (mapcar (improver 0f0)          biases  delta-bias))))))
+(defmethod learn ((optimizer sgd-optimizer) neural-network samples)
+  (declare (ignore optimizer))
+  (flet ((improver (decay)
+           (declare (type single-float decay))
+           (lambda (x delta-x)
+             (declare (type magicl:matrix/single-float x delta-x))
+             (magicl:.-
+              (magicl:.* (- 1f0 (* *learn-rate* decay)) x)
+              (magicl:.* (/ *learn-rate* *minibatch-size*) delta-x)
+              x))))
+    (multiple-value-bind (delta-weight delta-bias)
+        (calculate-gradient-minibatch neural-network samples)
+      (let ((weights (neural-network-weights neural-network))
+            (biases  (neural-network-biases  neural-network)))
+        (mapc (improver *decay-rate*) weights delta-weight)
+        (mapc (improver 0f0)          biases  delta-bias)))))
+
+(defmethod learn ((optimizer momentum-optimizer) neural-network samples)
+  (flet ((improver (decay)
+           (declare (type single-float decay))
+           (lambda (x delta-x accumulated-x)
+             (declare (type magicl:matrix/single-float x delta-x accumulated-x))
+             (magicl:.+ (magicl:.+
+                         (magicl:.* (* *learn-rate* decay) x)
+                         (magicl:.* (/ *learn-rate* *minibatch-size*) delta-x))
+                        (magicl:.* (momentum-coeff optimizer) accumulated-x)
+                        accumulated-x)
+             (magicl:.- x accumulated-x x))))
+    (multiple-value-bind (delta-weight delta-bias)
+        (calculate-gradient-minibatch neural-network samples)
+      (let ((weights (neural-network-weights neural-network))
+            (biases  (neural-network-biases  neural-network))
+            (acc-weights (optimizer-weights optimizer))
+            (acc-biases  (optimizer-biases  optimizer)))
+        (mapc (improver *decay-rate*) weights delta-weight acc-weights)
+        (mapc (improver 0f0)          biases  delta-bias   acc-biases)))))
 
 (defun train-epoch (neural-network generator
                     &key
+                      (optimizer (make-sgd-optimizer))
                       (learn-rate *learn-rate*)
                       (decay-rate *decay-rate*)
                       (minibatch-size *minibatch-size*))
@@ -261,7 +283,7 @@ of each cons pair."
        for i fixnum from 0 by *minibatch-size*
        while minibatch-samples
        do
-         (learn neural-network minibatch-samples)
+         (learn optimizer neural-network minibatch-samples)
          (when (zerop (rem i 1000))
            (format *standard-output* "~d... " i)
            (force-output))

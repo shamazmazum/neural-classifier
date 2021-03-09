@@ -59,3 +59,5 @@ start with zero (which is the default).")
 (defparameter *minibatch-size* 10
   "Number of samples to be used in stochastic gradient descent
 algorithm.")
+(defparameter *momentum-coeff* 0.8
+  "Hyperparameter for SGD optimizer with momentum")
