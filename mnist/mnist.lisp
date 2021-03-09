@@ -115,7 +115,7 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
    :input-trans%  #'possibly-invert
    :output-trans  #'neural-classifier:idx-abs-max
    :label-trans   #'label-transform
-   :activation-funcs '(:rlu :softmax)))
+   :activation-funcs '(:abs :softmax)))
 
 (defun train-epoch (classifier)
   (neural-classifier:train-epoch
