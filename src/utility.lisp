@@ -1,9 +1,6 @@
 (in-package :neural-classifier)
 
-(declaim (ftype (function (activation-symbol)
-                          (values function &optional))
-                activation-fn activation-fn-derivative)
-         (optimize (speed 3)))
+(declaim (optimize (speed 3)))
 
 (defun random-normal (&key (mean 0f0) (sigma 0f0))
   (declare (type single-float mean sigma))
@@ -14,63 +11,69 @@
    0f0))
 
 ;; Activation functions
-(defun sigma (z)
+(defgeneric activation (vector type)
+  (:documentation "Apply activation function TYPE to a VECTOR"))
+
+(defgeneric activation-derivative (vector type)
+  (:documentation "Apply derivative of activation function TYPE to a VECTOR"))
+
+(defun sigmoid (z)
   (declare (type single-float z))
   (/ (1+ (exp (- z)))))
 
-(defun sigma-derivative (z)
-  (declare (type single-float z))
-  (let ((s (sigma z)))
-    (* s (- 1.0 s))))
+(defmethod activation (vector (type (eql :sigmoid)))
+  (declare (type magicl:matrix/single-float vector))
+  (magicl:map #'sigmoid vector))
 
-(defun tanh-derivative (z)
-  (declare (type single-float z))
-  (let ((t% (tanh z)))
-    (* (1+ t%) (- 1.0 t%))))
+(defmethod activation-derivative (vector (type (eql :sigmoid)))
+  (declare (type magicl:matrix/single-float vector))
+  (magicl:map
+   (lambda (z)
+     (let ((s (sigmoid z)))
+       (* s (- 1.0 s))))
+   vector))
 
-(defun abs-fn (z)
-  (declare (type single-float z))
-  (abs z))
+(defmethod activation (vector (type (eql :tanh)))
+  (declare (type magicl:matrix/single-float vector))
+  (magicl:map #'tanh vector))
 
-(defun abs-derivative (z)
-  (declare (type single-float z))
-  (signum z))
+(defmethod activation-derivative (vector (type (eql :tanh)))
+  (declare (type magicl:matrix/single-float vector))
+  (magicl:map
+   (lambda (z)
+     (declare (type single-float z))
+     (let ((t% (tanh z)))
+       (* (1+ t%) (- 1.0 t%))))
+   vector))
 
-(defun relu (z)
-  (declare (type single-float z))
-  (max 0.0 z))
+(defmethod activation (vector (type (eql :abs)))
+  (declare (type magicl:matrix/single-float vector))
+  (magicl:map #'abs vector))
 
-(defun relu-derivative (z)
-  (declare (type single-float z))
-  (max (signum z) 0.0))
+(defmethod activation-derivative (vector (type (eql :abs)))
+  (declare (type magicl:matrix/single-float vector))
+  (magicl:map #'signum vector))
 
-(defun softmax (v)
-  (declare (type magicl:matrix/single-float v))
-  (let ((v% (magicl:map #'exp v)))
-    (magicl:./ v%
-               (magicl:sasum v%))))
+(defmethod activation (vector (type (eql :relu)))
+  (declare (type magicl:matrix/single-float vector))
+  (magicl:map
+   (lambda (z)
+     (declare (type single-float z))
+     (max 0.0 z))
+   vector))
 
-(defun softmax-derivative (z)
-  (declare (ignore z))
-  (error "Why I am here?"))
+(defmethod activation-derivative (vector (type (eql :relu)))
+  (declare (type magicl:matrix/single-float vector))
+  (magicl:map
+   (lambda (z)
+     (declare (type single-float z))
+     (max 0.0 (signum z)))
+   vector))
 
-(defun activation-fn (symbol)
-  (declare (type activation-symbol symbol))
-  (ecase symbol
-    (:sigmoid (lambda (v) (magicl:map #'sigma v)))
-    (:tanh    (lambda (v) (magicl:map #'tanh v)))
-    (:abs     (lambda (v) (magicl:map #'abs-fn v)))
-    (:relu    (lambda (v) (magicl:map #'relu v)))
-    (:softmax #'softmax)))
-
-(defun activation-fn-derivative (symbol)
-  (declare (type activation-symbol symbol))
-  (ecase symbol
-    (:sigmoid (lambda (v) (magicl:map #'sigma-derivative v)))
-    (:tanh    (lambda (v) (magicl:map #'tanh-derivative v)))
-    (:abs     (lambda (v) (magicl:map #'abs-derivative v)))
-    (:relu    (lambda (v) (magicl:map #'relu-derivative v)))
-    (:softmax #'softmax-derivative)))
+(defmethod activation (vector (type (eql :softmax)))
+  (declare (type magicl:matrix/single-float vector))
+  (let ((v% (magicl:map #'exp vector)))
+    (magicl:./ v% (magicl:sasum v%))))
 
 (defun idx-abs-max (matrix)
   "Returns index of first element with maximal absolute value by

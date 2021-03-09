@@ -114,9 +114,10 @@ output column from the network."
     (flet ((calculate-layer (input layer)
              (destructuring-bind (weights biases activation)
                  layer
-               (funcall (activation-fn activation)
-                        (magicl:.+ (magicl:@ weights input)
-                                   biases)))))
+               (activation
+                (magicl:.+ (magicl:@ weights input)
+                           biases)
+                activation))))
       (funcall
        output-trans
        (reduce #'calculate-layer
@@ -133,7 +134,7 @@ output column from the network."
                  (destructuring-bind (weights biases activation)
                      (car layers)
                    (let* ((z (magicl:.+ (magicl:@ weights input) biases))
-                          (out (funcall (activation-fn activation) z)))
+                          (out (activation z activation)))
                      (accumulate-z-and-out
                       (cdr layers)
                       out
@@ -160,7 +161,7 @@ output column from the network."
                      (car layer)
                    (backprop (cdr layer)
                              (cons
-                              (magicl:.* (funcall (activation-fn-derivative activation-l) z-l)
+                              (magicl:.* (activation-derivative z-l activation-l)
                                          (magicl:mult w-l+1 (car acc) :transa :t))
                               acc)))
                  acc)))
