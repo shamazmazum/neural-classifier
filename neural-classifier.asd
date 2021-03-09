@@ -7,6 +7,8 @@
   :pathname "src/"
   :serial t
   :components ((:file "package")
+               #+sbcl
+               (:file "sbcl-hacks")
                (:file "magicl-blas")
                (:file "definitions")
                (:file "utility")
