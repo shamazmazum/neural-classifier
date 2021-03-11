@@ -14,11 +14,20 @@
             :initform *momentum-coeff*))
   (:documentation "SGD optimizer with momentum"))
 
+(defclass nesterov-optimizer (momentum-optimizer)
+  ()
+  (:documentation "Nesterov accelerated SGD, improvement of SGD with
+momentum"))
+
 (defun make-sgd-optimizer ()
   (make-instance 'sgd-optimizer))
 
 (defun make-momentum-optimizer (neural-network)
   (make-instance 'momentum-optimizer
+                 :neural-network neural-network))
+
+(defun make-nesterov-optimizer (neural-network)
+  (make-instance 'nesterov-optimizer
                  :neural-network neural-network))
 
 (defgeneric learn (optimizer neural-network samples))
