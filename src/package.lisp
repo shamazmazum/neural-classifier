@@ -14,9 +14,9 @@
 
            #:idx-abs-max
 
-           #:make-sgd-optimizer
-           #:make-momentum-optimizer
-           #:make-nesterov-optimizer
+           #:sgd-optimizer
+           #:momentum-optimizer
+           #:nesterov-optimizer
 
            #:*momentum-coeff*
            #:*learn-rate*

@@ -122,7 +122,7 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
    classifier
    (snakes:sequence->generator
     (shuffle-vector *train-data*))
-   :optimizer (neural-classifier:make-momentum-optimizer classifier)))
+   :optimizer 'neural-classifier:momentum-optimizer))
 
 (defun rate (classifier vector)
   (neural-classifier:rate
