@@ -200,63 +200,57 @@ output column from the network."
   "Calculate gradient of the cost function based on multiple input samples"
   (declare (type list samples))
   (flet ((sum-matrices (matrices1 matrices2)
-           (declare (type list matrices1 matrices2))
-           (mapcar #'magicl:.+
-                   matrices1
-                   matrices2
-                   matrices2)))
-    (loop
-       with weights = nil
-       with biases = nil
-       for sample in samples
-       do
-         (multiple-value-bind (delta-weight delta-bias)
-             (calculate-gradient neural-network sample)
-           (push delta-weight weights)
-           (push delta-bias biases))
-       finally
-         (return
-           (values
-            (reduce #'sum-matrices weights)
-            (reduce #'sum-matrices biases))))))
+           (mapc #'magicl:.+
+                 matrices1
+                 matrices2
+                 matrices2))
+         (final-weights (x grad-x)
+           (magicl:.+ (magicl:./ grad-x (float *minibatch-size*))
+                      (magicl:.* *decay-rate* x)))
+         (final-biases (grad-x)
+           (magicl:./ grad-x (float *minibatch-size*))))
+
+    (multiple-value-bind (weights biases)
+        (calculate-gradient neural-network (car samples))
+      (loop
+        for sample in (cdr samples) do
+          (multiple-value-bind (delta-weight delta-bias)
+              (calculate-gradient neural-network sample)
+            (sum-matrices delta-weight weights)
+            (sum-matrices delta-bias   biases)))
+
+      (values
+       (mapcar #'final-weights
+               (neural-network-weights neural-network)
+               weights)
+       (mapcar #'final-biases biases)))))
 
 (defmethod learn ((optimizer sgd-optimizer) neural-network samples)
   (declare (ignore optimizer))
-  (flet ((improver (decay)
-           (declare (type single-float decay))
-           (lambda (x delta-x)
-             (declare (type magicl:matrix/single-float x delta-x))
-             (magicl:.-
-              (magicl:.* (- 1f0 (* *learn-rate* decay)) x)
-              (magicl:.* (/ *learn-rate* *minibatch-size*) delta-x)
-              x))))
+  (flet ((update (x delta-x)
+           (magicl:.- x (magicl:.* *learn-rate* delta-x) x)))
     (multiple-value-bind (delta-weight delta-bias)
         (calculate-gradient-minibatch neural-network samples)
       (let ((weights (neural-network-weights neural-network))
             (biases  (neural-network-biases  neural-network)))
-        (mapc (improver *decay-rate*) weights delta-weight)
-        (mapc (improver 0f0)          biases  delta-bias))))
+        (mapc #'update weights delta-weight)
+        (mapc #'update biases  delta-bias))))
   (values))
 
 (defmethod learn ((optimizer momentum-optimizer) neural-network samples)
-  (flet ((improver (decay)
-           (declare (type single-float decay))
-           (lambda (x delta-x accumulated-x)
-             (declare (type magicl:matrix/single-float x delta-x accumulated-x))
-             (magicl:.+ (magicl:.+
-                         (magicl:.* (* *learn-rate* decay) x)
-                         (magicl:.* (/ *learn-rate* *minibatch-size*) delta-x))
-                        (magicl:.* (momentum-coeff optimizer) accumulated-x)
-                        accumulated-x)
-             (magicl:.- x accumulated-x x))))
+  (flet ((update (x delta-x accumulated-x)
+           (magicl:.+ (magicl:.* *learn-rate* delta-x)
+                      (magicl:.* (momentum-coeff optimizer) accumulated-x)
+                      accumulated-x)
+           (magicl:.- x accumulated-x x)))
     (multiple-value-bind (delta-weight delta-bias)
         (calculate-gradient-minibatch neural-network samples)
       (let ((weights (neural-network-weights neural-network))
             (biases  (neural-network-biases  neural-network))
             (acc-weights (optimizer-weights optimizer))
             (acc-biases  (optimizer-biases  optimizer)))
-        (mapc (improver *decay-rate*) weights delta-weight acc-weights)
-        (mapc (improver 0f0)          biases  delta-bias   acc-biases))))
+        (mapc #'update weights delta-weight acc-weights)
+        (mapc #'update biases  delta-bias   acc-biases))))
   (values))
 
 (defmethod learn ((optimizer nesterov-optimizer) neural-network samples)
@@ -264,16 +258,13 @@ output column from the network."
            ;; Change weights & biases by accumulated value.
            ;; (Predict values for weights & biases).
            (magicl:.- x (magicl:.* (momentum-coeff optimizer) accumulated-x) x))
-         (step2 (decay)
-           (lambda (x delta-x accumulated-value)
+         (step2 (x delta-x accumulated-x)
              ;; Update accumulated value.
              ;; Set corrected values for weights and biases
-             (magicl:.+ (magicl:.* (momentum-coeff optimizer) accumulated-value)
-                        ;; FIXME: must be predicted value of x here!
-                        (magicl:.+ (magicl:.* (* *learn-rate* decay) x)
-                                   (magicl:.* (/ *learn-rate* *minibatch-size*) delta-x))
-                        accumulated-value)
-             (magicl:.- x accumulated-value x))))
+             (magicl:.+ (magicl:.* (momentum-coeff optimizer) accumulated-x)
+                        (magicl:.* *learn-rate* delta-x)
+                        accumulated-x)
+             (magicl:.- x accumulated-x x)))
     (let* ((weights (neural-network-weights neural-network))
            (biases  (neural-network-biases neural-network))
            (weights-copy (mapcar #'magicl::deep-copy-tensor weights))
@@ -287,8 +278,8 @@ output column from the network."
       (multiple-value-bind (delta-weight delta-bias)
           (calculate-gradient-minibatch neural-network samples)
         ;; Calculate the final position
-        (mapc (step2 *decay-rate*) weights-copy delta-weight acc-weights)
-        (mapc (step2 0f0)          biases-copy  delta-bias   acc-biases))
+        (mapc #'step2 weights-copy delta-weight acc-weights)
+        (mapc #'step2 biases-copy  delta-bias   acc-biases))
 
       ;; Set the new weights & biases
       (setf (neural-network-weights neural-network) weights-copy
