@@ -17,6 +17,7 @@
            #:sgd-optimizer
            #:momentum-optimizer
            #:nesterov-optimizer
+           #:adagrad-optimizer
            #:make-optimizer
 
            #:*momentum-coeff*

@@ -37,14 +37,15 @@
                            ,(loop repeat n-args collect 'single-float)))
                 ,@args)))))))
   (def-alien "exp" 1)
-  (def-alien "tanh" 1))
+  (def-alien "tanh" 1)
+  (def-alien "sqrt" 1))
 
 ;; Tell the compiler these functions are pure
 ;; (look at src/compiler/generic/vm-fndb.lisp in SBCL source code).
 
 ;; Additional hack is needed for these functions to be really flushable:
 ;; https://sourceforge.net/p/sbcl/mailman/message/37134684/
-(sb-c:defknown (%exp %tanh)
+(sb-c:defknown (%exp %tanh %sqrt)
     (single-float) single-float
     (sb-c:movable sb-c:flushable sb-c:foldable))
 
@@ -59,4 +60,5 @@
          `(sb-c:deftransform ,name (,args ,arg-types *)
             '(,trans-name ,@args)))))
   (def-trans exp 1)
-  (def-trans tanh 1))
+  (def-trans tanh 1)
+  (def-trans sqrt 1))

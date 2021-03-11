@@ -30,6 +30,12 @@ weights and biases. Not to be instantiated."))
   (:documentation "Nesterov accelerated SGD, improvement of SGD with
 momentum"))
 
+(defclass adagrad-optimizer (memoizing-optimizer)
+  ()
+  (:default-initargs
+   :initial-value 1f-8)
+  (:documentation "Adagrad optimizer"))
+
 (defun make-optimizer (type network)
   (if (eq type 'sgd-optimizer)
       (make-instance type)

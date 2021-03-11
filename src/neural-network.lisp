@@ -286,6 +286,33 @@ output column from the network."
             (neural-network-biases  neural-network) biases-copy)))
   (values))
 
+(defmethod learn ((optimizer adagrad-optimizer) neural-network samples)
+  (flet ((update (x delta-x accumulated-x)
+           (magicl:.+
+            ;; Works faster than (.* delta-x delta-x)
+            (magicl:map
+             (lambda (x)
+               (declare (type single-float x))
+               (expt x 2))
+             delta-x)
+            accumulated-x
+            accumulated-x)
+           (magicl:.-
+            x
+            (magicl:./
+             (magicl:.* *learn-rate* delta-x)
+             (magicl:map #'sqrt accumulated-x))
+            x)))
+    (multiple-value-bind (delta-weight delta-bias)
+        (calculate-gradient-minibatch neural-network samples)
+      (let ((weights (neural-network-weights neural-network))
+            (biases  (neural-network-biases  neural-network))
+            (acc-weights (optimizer-weights optimizer))
+            (acc-biases  (optimizer-biases  optimizer)))
+        (mapc #'update weights delta-weight acc-weights)
+        (mapc #'update biases  delta-bias   acc-biases))))
+  (values))
+
 (defun train-epoch (neural-network generator
                     &key
                       (optimizer (make-optimizer 'sgd-optimizer neural-network))
