@@ -308,6 +308,31 @@ output column from the network."
         (mapc #'update biases  delta-bias   acc-biases))))
   (values))
 
+(defmethod learn ((optimizer rmsprop-optimizer) neural-network samples)
+  (flet ((update (x delta-x accumulated-x)
+           (let ((coeff (momentum-coeff optimizer)))
+             (declare (type single-float coeff))
+             (magicl:.+
+              (magicl:.* (- 1.0 coeff)
+                         (magicl:.* delta-x delta-x))
+              (magicl:.* coeff accumulated-x)
+              accumulated-x))
+           (magicl:.-
+            x
+            (magicl:./
+             (magicl:.* *learn-rate* delta-x)
+             (magicl:map #'sqrt accumulated-x))
+            x)))
+    (multiple-value-bind (delta-weight delta-bias)
+        (calculate-gradient-minibatch neural-network samples)
+      (let ((weights (neural-network-weights neural-network))
+            (biases  (neural-network-biases  neural-network))
+            (acc-weights (optimizer-weights optimizer))
+            (acc-biases  (optimizer-biases  optimizer)))
+        (mapc #'update weights delta-weight acc-weights)
+        (mapc #'update biases  delta-bias   acc-biases))))
+  (values))
+
 (defun train-epoch (neural-network generator
                     &key
                       (optimizer (make-optimizer 'sgd-optimizer neural-network))

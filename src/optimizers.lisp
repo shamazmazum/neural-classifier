@@ -36,6 +36,15 @@ momentum"))
    :initial-value 1f-8)
   (:documentation "Adagrad optimizer"))
 
+(defclass rmsprop-optimizer (memoizing-optimizer)
+  ((coeff   :type single-float
+            :accessor momentum-coeff
+            :initarg :coeff
+            :initform *momentum-coeff*))
+  (:default-initargs
+   :initial-value 1f-8)
+  (:documentation "RMSprop optimizer"))
+
 (defun make-optimizer (type network)
   (if (eq type 'sgd-optimizer)
       (make-instance type)

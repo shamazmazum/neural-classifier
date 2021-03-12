@@ -18,6 +18,7 @@
            #:momentum-optimizer
            #:nesterov-optimizer
            #:adagrad-optimizer
+           #:rmsprop-optimizer
            #:make-optimizer
 
            #:*momentum-coeff*
