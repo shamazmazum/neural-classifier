@@ -288,7 +288,7 @@ output column from the network."
 
 (defun train-epoch (neural-network generator
                     &key
-                      (optimizer 'sgd-optimizer)
+                      (optimizer (make-optimizer 'sgd-optimizer neural-network))
                       (learn-rate *learn-rate*)
                       (decay-rate *decay-rate*)
                       (minibatch-size *minibatch-size*))
@@ -301,11 +301,11 @@ of each cons pair."
   (declare (type single-float learn-rate decay-rate)
            (type neural-network neural-network)
            (type positive-fixnum minibatch-size)
-           (type snakes:basic-generator generator))
+           (type snakes:basic-generator generator)
+           (type optimizer optimizer))
   (let ((*learn-rate* learn-rate)
         (*decay-rate* decay-rate)
-        (*minibatch-size* minibatch-size)
-        (optimizer (make-optimizer optimizer neural-network)))
+        (*minibatch-size* minibatch-size))
     (loop
        for minibatch-samples =
          (snakes:take *minibatch-size* generator

@@ -117,12 +117,12 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
    :label-trans   #'label-transform
    :activation-funcs '(:abs :softmax)))
 
-(defun train-epoch (classifier)
+(defun train-epoch (classifier optimizer)
   (neural-classifier:train-epoch
    classifier
    (snakes:sequence->generator
     (shuffle-vector *train-data*))
-   :optimizer 'neural-classifier:momentum-optimizer))
+   :optimizer optimizer))
 
 (defun rate (classifier vector)
   (neural-classifier:rate
@@ -132,11 +132,15 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
 (defun train-epochs (classifier n)
   "Train a neural network @c(classifier) for @c(n) epochs.
 Return a list of accuracy data for each epoch of training."
-  (loop repeat n collect
-       (progn
-         (train-epoch classifier)
-         (cons (rate classifier *train-data*)
-               (rate classifier *test-data*)))))
+  (loop with optimizer = (neural-classifier:make-optimizer
+                          'neural-classifier:momentum-optimizer
+                          classifier)
+        repeat n
+        collect
+        (progn
+          (train-epoch classifier optimizer)
+          (cons (rate classifier *train-data*)
+                (rate classifier *test-data*)))))
 
 (progn
   (format t "Place MNIST dataset to ~a (controlled by ~a) and run ~a~%"

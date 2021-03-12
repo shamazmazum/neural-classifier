@@ -1,9 +1,12 @@
 (in-package :neural-classifier)
 
-(defclass sgd-optimizer () ()
+(defclass optimizer () ()
+  (:documentation "Generic optimizer class. Not to be instantiated"))
+
+(defclass sgd-optimizer (optimizer) ()
   (:documentation "The simplest SGD optimizer"))
 
-(defclass memoizing-optimizer ()
+(defclass memoizing-optimizer (optimizer)
   ((weights       :type list
                   :accessor optimizer-weights)
    (biases        :type list

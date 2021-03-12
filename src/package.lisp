@@ -17,6 +17,7 @@
            #:sgd-optimizer
            #:momentum-optimizer
            #:nesterov-optimizer
+           #:make-optimizer
 
            #:*momentum-coeff*
            #:*learn-rate*
