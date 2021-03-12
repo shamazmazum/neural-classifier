@@ -29,6 +29,7 @@
      1)
     copy))
 
+;; Scalar - matrix division
 (defmethod ./ ((source1 matrix/single-float)
                (source2 single-float)
                &optional target)
@@ -58,6 +59,7 @@
      (storage source2) 1)
     source2))
 
+;; Matrix subtraction
 (defmethod .- ((source1 matrix/single-float)
                (source2 matrix/single-float)
                &optional target)
@@ -74,6 +76,42 @@
      (storage source2) 1
      (storage source1) 1)
     source1))
+
+;; Matrix element-wise multiplication
+(defmethod .* ((source1 matrix/single-float)
+               (source2 matrix/single-float)
+               &optional target)
+  (declare (optimize (speed 3)))
+  (policy-cond:with-expectations (> speed safety)
+      ((assertion (equalp (shape source1)
+                          (shape source2)))))
+  (let ((target (or target (zeros (shape source1)
+                                  :type 'single-float))))
+    (let ((target-st  (storage target))
+          (source1-st (storage source1))
+          (source2-st (storage source2)))
+      (declare (type (simple-array single-float)
+                     target-st source1-st source2-st))
+      (map-into target-st #'* source1-st source2-st))
+    target))
+
+;; Matrix element-wise division
+(defmethod ./ ((source1 matrix/single-float)
+               (source2 matrix/single-float)
+               &optional target)
+  (declare (optimize (speed 3)))
+  (policy-cond:with-expectations (> speed safety)
+      ((assertion (equalp (shape source1)
+                          (shape source2)))))
+  (let ((target (or target (zeros (shape source1)
+                                  :type 'single-float))))
+    (let ((target-st  (storage target))
+          (source1-st (storage source1))
+          (source2-st (storage source2)))
+      (declare (type (simple-array single-float)
+                     target-st source1-st source2-st))
+      (map-into target-st #'/ source1-st source2-st))
+    target))
 
 (defmethod map! ((function function) (tensor matrix))
   (map-into

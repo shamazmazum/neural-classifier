@@ -289,12 +289,7 @@ output column from the network."
 (defmethod learn ((optimizer adagrad-optimizer) neural-network samples)
   (flet ((update (x delta-x accumulated-x)
            (magicl:.+
-            ;; Works faster than (.* delta-x delta-x)
-            (magicl:map
-             (lambda (x)
-               (declare (type single-float x))
-               (expt x 2))
-             delta-x)
+            (magicl:.* delta-x delta-x)
             accumulated-x
             accumulated-x)
            (magicl:.-
