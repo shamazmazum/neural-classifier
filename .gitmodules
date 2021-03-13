@@ -1,0 +1,3 @@
+[submodule "mnist/dataset"]
+	path = mnist/dataset
+	url = git://github.com/shamazmazum/mnist-dataset

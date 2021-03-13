@@ -1,7 +1,9 @@
 (in-package :neural-classifier-mnist)
 
 (defparameter *mnist-dataset-path*
-  #p"~/mnist-dataset/"
+  (asdf:system-relative-pathname
+   :neural-classifier/mnist
+   #p"mnist/dataset/")
   "Path to MNIST dataset")
 
 (defvar *train-data* nil)
