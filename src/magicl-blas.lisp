@@ -17,29 +17,18 @@
     (t
       (deep-copy-tensor source))))
 
-;; Scalar - matrix multiplication
-(defmethod .* ((source1 single-float)
-               (source2 matrix/single-float)
-               &optional target)
-  (let ((copy (copy-matrix source2 target)))
-    (magicl.blas-cffi:%sscal
-     (size source2)
-     source1
-     (storage copy)
-     1)
-    copy))
+(defmethod scale ((tensor matrix) factor)
+  (scale! (deep-copy-tensor tensor) factor))
 
-;; Scalar - matrix division
-(defmethod ./ ((source1 matrix/single-float)
-               (source2 single-float)
-               &optional target)
-  (let ((copy (copy-matrix source1 target)))
-    (magicl.blas-cffi:%sscal
-     (size source1)
-     (/ source2)
-     (storage copy)
-     1)
-    copy))
+;; Scalar - matrix multiplication
+(defmethod scale! ((tensor matrix/single-float)
+                   (factor single-float))
+  (magicl.blas-cffi:%sscal
+   (size tensor)
+   factor
+   (storage tensor)
+   1)
+  tensor)
 
 ;; Matrix addition
 (defmethod .+ ((source1 matrix/single-float)

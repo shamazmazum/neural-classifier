@@ -205,10 +205,10 @@ output column from the network."
                  matrices2
                  matrices2))
          (final-weights (x grad-x)
-           (magicl:.+ (magicl:./ grad-x (float *minibatch-size*))
-                      (magicl:.* *decay-rate* x)))
+           (magicl:.+ (magicl:scale grad-x (/ (float *minibatch-size*)))
+                      (magicl:scale x *decay-rate*)))
          (final-biases (grad-x)
-           (magicl:./ grad-x (float *minibatch-size*))))
+           (magicl:scale grad-x (/ (float *minibatch-size*)))))
 
     (multiple-value-bind (weights biases)
         (calculate-gradient neural-network (car samples))
@@ -228,7 +228,7 @@ output column from the network."
 (defmethod learn ((optimizer sgd-optimizer) neural-network samples)
   (declare (ignore optimizer))
   (flet ((update (x delta-x)
-           (magicl:.- x (magicl:.* *learn-rate* delta-x) x)))
+           (magicl:.- x (magicl:scale delta-x *learn-rate*) x)))
     (multiple-value-bind (delta-weight delta-bias)
         (calculate-gradient-minibatch neural-network samples)
       (let ((weights (neural-network-weights neural-network))
@@ -239,8 +239,8 @@ output column from the network."
 
 (defmethod learn ((optimizer momentum-optimizer) neural-network samples)
   (flet ((update (x delta-x accumulated-x)
-           (magicl:.+ (magicl:.* *learn-rate* delta-x)
-                      (magicl:.* (momentum-coeff optimizer) accumulated-x)
+           (magicl:.+ (magicl:scale delta-x *learn-rate*)
+                      (magicl:scale accumulated-x (momentum-coeff optimizer))
                       accumulated-x)
            (magicl:.- x accumulated-x x)))
     (multiple-value-bind (delta-weight delta-bias)
@@ -257,12 +257,12 @@ output column from the network."
   (flet ((step1 (x accumulated-x)
            ;; Change weights & biases by accumulated value.
            ;; (Predict values for weights & biases).
-           (magicl:.- x (magicl:.* (momentum-coeff optimizer) accumulated-x) x))
+           (magicl:.- x (magicl:scale accumulated-x (momentum-coeff optimizer)) x))
          (step2 (x delta-x accumulated-x)
              ;; Update accumulated value.
              ;; Set corrected values for weights and biases
-             (magicl:.+ (magicl:.* (momentum-coeff optimizer) accumulated-x)
-                        (magicl:.* *learn-rate* delta-x)
+             (magicl:.+ (magicl:scale accumulated-x (momentum-coeff optimizer))
+                        (magicl:scale delta-x *learn-rate*)
                         accumulated-x)
              (magicl:.- x accumulated-x x)))
     (let* ((weights (neural-network-weights neural-network))
@@ -295,7 +295,7 @@ output column from the network."
            (magicl:.-
             x
             (magicl:./
-             (magicl:.* *learn-rate* delta-x)
+             (magicl:scale delta-x *learn-rate*)
              (magicl:map #'sqrt accumulated-x))
             x)))
     (multiple-value-bind (delta-weight delta-bias)
@@ -313,14 +313,13 @@ output column from the network."
            (let ((coeff (momentum-coeff optimizer)))
              (declare (type single-float coeff))
              (magicl:.+
-              (magicl:.* (- 1.0 coeff)
-                         (magicl:.* delta-x delta-x))
-              (magicl:.* coeff accumulated-x)
+              (magicl:scale (magicl:.* delta-x delta-x) (- 1.0 coeff))
+              (magicl:scale accumulated-x coeff)
               accumulated-x))
            (magicl:.-
             x
             (magicl:./
-             (magicl:.* *learn-rate* delta-x)
+             (magicl:scale delta-x *learn-rate*)
              (magicl:map #'sqrt accumulated-x))
             x)))
     (multiple-value-bind (delta-weight delta-bias)

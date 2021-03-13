@@ -73,7 +73,8 @@
 (defmethod activation (vector (type (eql :softmax)))
   (declare (type magicl:matrix/single-float vector))
   (let ((v% (magicl:map #'exp vector)))
-    (magicl:./ v% (magicl:sasum v%))))
+    (magicl:scale v% (/ (the single-float
+                             (magicl:sasum v%))))))
 
 (defun idx-abs-max (matrix)
   "Returns index of first element with maximal absolute value by
