@@ -11,14 +11,11 @@ MNIST/EMNIST datasets. For API documentation visit
 
 ## How to work with MNIST dataset?
 
-* Create a directory and place MNIST data in it. There are 4 files in the MNIST
-  set: `t10k-images-idx3-ubyte`, `t10k-labels-idx1-ubyte`,
-  `train-images-idx3-ubyte` and ` train-labels-idx1-ubyte`.
+* Unpack files in `mnist/dataset` directory.
 * Load `neural-classifier/mnist` system: `(ql:quickload
   :neural-classifier/mnist)`.
-* Set `neural-classifier-mnist:*mnist-dataset-path*` to your directory with
-  MNIST data and execute `(neural-classifier-mnist:load-mnist-database)` (this
-  will take about 10-15 seconds).
+* Eval `(neural-classifier-mnist:load-mnist-database)` (this will take about
+  10-15 seconds).
 * Create a neural network: `(defparameter *nn*
   neural-classifier-mnist:make-mnist-classifier 35)` where `35` is a number of
   hidden neurons.
@@ -34,6 +31,15 @@ MNIST/EMNIST datasets. For API documentation visit
   `neural-classifier:*decay-rate*` is related to regularization and should be
   about `5/N` where `N` is a number of training samples. Zero means no
   regularization.
+
+## How to build custom nets and data?
+
+See GH pages for this project (link above). In general you need to write
+functions which translate your data and labels into `magicl:matrix/single-float`
+matrices. Then you create a net with `neural-classifier:make-neural-network`
+function and `snakes` generator which returns conses in the form `(DATA
+. LABEL)`. To train a network for one epoch you call
+`(neural-classifier:train-epoch)`.
 
 ## Dependencies
 

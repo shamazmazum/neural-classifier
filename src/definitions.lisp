@@ -50,14 +50,18 @@
                *learn-rate* *decay-rate*)
          (type positive-fixnum *minibatch-size*))
 (defparameter *learn-rate* 0.005f0
-  "Speed of gradient descent algorithm. Bigger values result in faster
-learning, but too big is bad.")
+  "Learning speed for gradient descent algorithms. Bigger values
+result in faster learning, but too big is bad. Default value is good
+for SGD, SGD with momentum and NAG optimizers. For Adagrad and
+RMSprop try 0.001f0.")
 (defparameter *decay-rate* 0f0
   "Regularization parameter @c(λ/N), where @c(N) is the number of
 objects in the training set and @c(λ) must be about 1-10. If not sure,
 start with zero (which is the default).")
 (defparameter *minibatch-size* 10
-  "Number of samples to be used in stochastic gradient descent
-algorithm.")
+  "Number of samples to be used for one update of network parameters.")
 (defparameter *momentum-coeff* 0.8
-  "Hyperparameter for SGD optimizer with momentum")
+  "Hyperparameter for SGD optimizers which use momentum. Zero means
+just usual SGD. RMSprop also uses this parameter in accumulation of
+squared partial derivatives of network parameters. Good values are
+0.8-0.9.")

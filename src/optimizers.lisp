@@ -46,11 +46,13 @@ momentum"))
   (:documentation "RMSprop optimizer"))
 
 (defun make-optimizer (type network)
+  "Make optimizer of type @c(type) for a network @c(network)."
   (if (eq type 'sgd-optimizer)
       (make-instance type)
       (make-instance type :neural-network network)))
 
-(defgeneric learn (optimizer neural-network samples))
+(defgeneric learn (optimizer neural-network samples)
+  (:documentation "Update network parameters using SAMPLES for training."))
 
 (defmethod initialize-instance :after ((optimizer memoizing-optimizer)
                                        &rest initargs
