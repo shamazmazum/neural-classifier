@@ -46,21 +46,21 @@
   <h1 class="doc-title">neural-classifier » General information</h1>
   <article id="article" data-section="general-information">
     <aside>
-      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
     </aside>
     <main class="codex-section">
       <p>
    Typical neural network lifecycle is the following:
-   </p><ol><li>Adjust <code>neural-classifier:*learn-rate*</code>,
-            <code>neural-classifier:*decay-rate*</code> and
-            <code>neural-classifier:*minibatch-size*</code> parameters if you want.</li><li>Create a <code>snakes</code> generator which will return data for the
-            training step in the form <code>(CONS SAMPLE LABEL)</code>(i.e. cons pair
+   </p><ol><li>Adjust hyperparameters if you want. See
+            <a id="hyper" href="hyper.html" data-node="hyper">Hyperparameters</a> section for details. Default values
+            are usually OK.</li><li>Create a <code>snakes</code> generator which will return data for the
+            training step in the form <code>(data-object . label)</code>(i.e. cons pair
             which contains a sample for training and a label which describes
             that sample).</li><li>Create four functions: The first and the second translate a sample
             returned by the generator created in the previous step to
             <code>magicl:matrix/single-float</code> matrix with dimensions <code>Nx1</code>. One
-            of them will be used by <code>calculate</code> and another one will be used
-            during the training. The function used for training may make
+            of them will be used by <code>calculate</code> function and another one will
+            be used during the training. The function used for training may make
             additional random transformations of the input data to extend
             training set. The third translates a label to
             <code>magicl:matrix/single-float</code> matrix with dimensions <code>Mx1</code> and
@@ -76,7 +76,75 @@
             <code>snakes:generator-stop</code>).</li><li>Repeat steps 2 and 5 to train for more epochs. You can use
             <code>neural-classifier:rate</code> function to control the accuracy of your
             network, so you know where to stop training.</li><li>After the net is trained, call <code>neural-classifier:calculate</code> to
-            pass your data through the net.</li></ol><p>If you want an example, look at <code>mnist/mnist.lisp</code> to see how digit
+            pass your data through the net.</li></ol><p>Abstact example: find a human face on photo.</p><pre><code class="lisp">(defun load-image (pathname)
+  ;; Assume that our images are PNGs prescaled to 50x50 pixels
+  (let ((image (opticl:coerce-image
+                (opticl:read-png-file pathname)
+                'opticl:gray-image))
+        (matrix (magicl:empty '(#.(* 50 50))
+                              :type 'single-float)))
+    ;; Convert simple array to magicl:matrix/single-float column
+    (loop for i below (* 50 50) do
+      (setf (magicl:tref matrix i 0)
+            (/ (row-major-aref image i) 255.0)))
+    matrix))
+
+(defun classify (output)
+  (declare (type magicl:matrix/single-float output))
+  ;; When the first output value is less than the second one, classify
+  ;; the picture as face
+  (if (&lt; (magicl:tref output 0 0)
+         (magicl:tref output 1 0))
+      :face :no-face))
+
+(defun label-to-matrix (label)
+  (declare (type (member :face :no-face) label))
+  ;; Convert labels to matrices
+  (ecase label
+    (:face    (magicl:from-list '(0f0 1f0) '(2 1)))
+    (:no-face (magicl:from-list '(1f0 0f0) '(2 1)))))
+
+(defun make-network ()
+  (neural-classifier:make-neural-network
+   ;; One input layer with 50x50 neurons
+   ;; One hidden layer with 100 neurons
+   ;; One output layer with 2 neurons.
+   '(#.(* 50 50) 100 2)
+   ;; This is used for image loading in trained net
+   :input-trans #'load-image
+   ;; This is used for image loading while training
+   :input-trans% (alexandria:compose #'add-noise #'random-rotate #'load-image)
+   ;; This is used to produce a label
+   :output-trans #'classify
+   ;; Produce a matrix from a label
+   :label-trans #'label-to-matrix
+   ;; Activation fnctions: relu in the hidden layer, softmax in the
+   ;; output
+   :activation-funcs '(:relu :softmax)))
+
+(defun train-epochs (network n)
+  &quot;Train a network for n epochs&quot;
+  ;; Arrange our train data
+  (let ((data (snakes:list-&gt;generator
+               (mapcar
+                (lambda (pathname)
+                  (cons pathname
+                        (if (face-p pathname)
+                            :face :no-face)))
+                *list-of-pictures*))))
+    (loop repeat n
+          ;; Train one epoch
+          do (neural-classifier:train-epoch network data)
+          ;; Collect accuracy of recognition.
+          ;; You must use another set for validation data in real
+          ;; use.
+          collect (neural-classifier:rate network data))))
+
+(defun classify-image (network pathname)
+  ;; When network is trained, just pass your image to CALCULATE
+  ;; to classify it.
+  (neural-classifier:calculate network pathname))
+</code></pre><p>If you want another example, look at <code>mnist/mnist.lisp</code> to see how digit
 recognition works.
 </p>
     </main>

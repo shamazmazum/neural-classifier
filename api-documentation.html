@@ -46,20 +46,10 @@
   <h1 class="doc-title">neural-classifier » API documentation</h1>
   <article id="article" data-section="api-documentation">
     <aside>
-      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
     </aside>
     <main class="codex-section">
       
-   <u>Hyper-parameters</u>
-   
-      <div class="codex-doc-node codex-variable"><code class="codex-name">*learn-rate*</code><div class="codex-docstring">Speed of gradient descent algorithm. Bigger values result in faster
-learning, but too big is bad.</div></div>
-      <div class="codex-doc-node codex-variable"><code class="codex-name">*decay-rate*</code><div class="codex-docstring">Regularization parameter <code>λ/N</code>, where <code>N</code> is the number of
-objects in the training set and <code>λ</code> must be about 1-10. If not sure,
-start with zero (which is the default).</div></div>
-      <div class="codex-doc-node codex-variable"><code class="codex-name">*minibatch-size*</code><div class="codex-docstring">Number of samples to be used in stochastic gradient descent
-algorithm.</div></div>
-   
    <u>Neural network class and accessors</u>
    
       <div class="codex-doc-node codex-record codex-class"><code class="codex-name">neural-network</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Class for neural networks</div><ul class="codex-slot-list"><li class="codex-slot codex-class-slot"><code class="codex-name">layout</code><div class="codex-docstring">Number of neurons in each layer of the network</div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">list</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initarg:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">:layout</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initform:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(error &quot;Specify number of neurons in each layer&quot;)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Readers:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(neural-network-layout)</code></td></tr></table></div></li><li class="codex-slot codex-class-slot"><code class="codex-name">activation-funcs</code><div class="codex-docstring">List of activation functions.</div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">list</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initarg:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">:activation-funcs</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initform:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Accessors:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(neural-network-activation-funcs)</code></td></tr></table></div></li><li class="codex-slot codex-class-slot"><code class="codex-name">weights</code><div class="codex-docstring">Weight matrices for each layer</div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">list</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Accessors:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(neural-network-weights)</code></td></tr></table></div></li><li class="codex-slot codex-class-slot"><code class="codex-name">biases</code><div class="codex-docstring">Bias vectors for each layer</div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">list</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Accessors:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(neural-network-biases)</code></td></tr></table></div></li><li class="codex-slot codex-class-slot"><code class="codex-name">input-trans</code><div class="codex-docstring">Function which translates an input object to a vector</div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">function</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initarg:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">:input-trans</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initform:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(function identity)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Accessors:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(neural-network-input-trans)</code></td></tr></table></div></li><li class="codex-slot codex-class-slot"><code class="codex-name">output-trans</code><div class="codex-docstring">Function which translates an output vector to a label.</div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">function</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initarg:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">:output-trans</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initform:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(function identity)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Accessors:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(neural-network-output-trans)</code></td></tr></table></div></li><li class="codex-slot codex-class-slot"><code class="codex-name">input-trans%</code><div class="codex-docstring">Function which translates an input object to a vector
@@ -67,54 +57,55 @@ algorithm.</div></div>
    
    <u>Functions</u>
    
-      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">make-neural-network</code><code class="codex-lambda-list">(layout &amp;key input-trans output-trans input-trans% label-trans activation-funcs)</code><div class="codex-docstring"><p>Create a new neural network.</p><p>
-<code>layout</code> is a list of positive integers which describes the amount
-of neurons in each layer (starting from input layer).</p><p>
-<code>activation-funcs</code> is a list all the elements of which are either
-<code>:sigmoid</code>, <code>:tanh</code>, <code>:abs</code>, <code>:relu</code> or <code>:softmax</code>. The
-length of this list must be equal to the length of <code>layout</code> minus
-one. The last element cannot be <code>:abs</code> or <code>:relu</code>. <code>:softmax</code>
-can be only the last element.</p><p>
-<code>input-trans</code> is a function which is applied to an object passed to
-<code>calculate</code> to transform it into an input column (that is a matrix
-with the type <code>magicl:matrix/single-float</code> and the shape <code>Nx1</code>,
-where <code>N</code> is the first number in the <code>layout</code>). For example, if we
-are recognizing digits from the MNIST set, this function can take a
-number of an image in the set and return <code>784x1</code> matrix.</p><p>
-<code>output-trans</code> is a function which is applied to the output of
-<code>calculate</code> function (that is a matrix with the type
-<code>magicl:matrix/single-float</code> and the shape Mx1, where M is the last
-number in the <code>layout</code>) to return some object with user-defined
-meaning (called a label). Again, if we are recognizing digits, this
-function transforms <code>10x1</code> matrix to a number from 0 to 9.</p><p>
-<code>input-trans%</code> is just like <code>input-trans</code>, but is used while
-training. It can include additional transformations to extend your
-training set (e.g. it can add some noise to resulting vector, rotate a
-picture by a small random angle, etc.).</p><p>
-<code>label-trans</code> is a function which is applied to a label to get a
-column (that is a matrix with the type <code>magicl:matrix/single-float</code>
-and the shape <code>Mx1</code>, where <code>M</code> is the last number in the
-<code>layout</code>) which is optimal output from the network for this
-object. With digits recognition, this function may take a digit <code>n</code>
-and return <code>10x1</code> matrix of all zeros with exception for <code>n</code>-th
-element which would be <code>1f0</code>.</p><p>
-Default value for all transformation functions is <code>identity</code>.</p></div></div>
-      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">calculate</code><code class="codex-lambda-list">(neural-network object)</code><div class="codex-docstring">Calculate the output from the network <code>neural-network</code> for the
-object <code>object</code>. The input transformation function is applied to the
-<code>object</code> and the output transformation function is applied to the
-output column from the network.</div></div>
-      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">train-epoch</code><code class="codex-lambda-list">(neural-network generator &amp;key (optimizer (make-optimizer (quote sgd-optimizer) neural-network)) (learn-rate *learn-rate*) (decay-rate *decay-rate*) (minibatch-size *minibatch-size*))</code><div class="codex-docstring">Perform a training of <code>neural-network</code> on every object returned
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">make-neural-network</code><code class="codex-lambda-list">(layout &amp;key input-trans output-trans input-trans% label-trans activation-funcs)</code><div class="codex-docstring">Create a new neural network.
+<ul><li><code>layout</code> is a list of positive integers which describes the
+      amount of neurons in each layer (starting from input layer).</li><li><code>activation-funcs</code> is a list all the elements of which are
+      either <code>:sigmoid</code>, <code>:tanh</code>, <code>:abs</code>, <code>:relu</code> or
+      <code>:softmax</code>. The length of this list must be equal to the
+      length of <code>layout</code> minus one because the input layer does not
+      have an activation function. The last element cannot be <code>:abs</code>
+      or <code>:relu</code> and <code>:softmax</code> can only be the last element.</li><li><code>input-trans</code> is a function which is applied to an object
+      passed to <code>calculate</code> to transform it into an input column
+      (that is a matrix with the type <code>magicl:matrix/single-float</code>
+      and the shape <code>Nx1</code>, where <code>N</code> is the first number in the
+      <code>layout</code>). For example, if we are recognizing digits from the
+      MNIST set, this function can take a number of an image in the
+      set and return <code>784x1</code> matrix.</li><li><code>output-trans</code> is a function which is applied to the output of
+      <code>calculate</code> function (that is a matrix with the type
+      <code>magicl:matrix/single-float</code> and the shape Mx1, where M is the
+      last number in the <code>layout</code>) to return some object with
+      user-defined meaning (called a label). Again, if we are
+      recognizing digits, this function transforms <code>10x1</code> matrix to
+      a number from 0 to 9.</li><li><code>input-trans%</code> is just like <code>input-trans</code>, but is used while
+      training. It can include additional transformations to extend
+      your training set (e.g. it can add some noise to input data,
+      rotate an input picture by a small random angle, etc.).</li><li><code>label-trans</code> is a function which is applied to a label to get
+      a column (that is a matrix with the type
+      <code>magicl:matrix/single-float</code> and the shape <code>Mx1</code>, where
+      <code>M</code> is the last number in the <code>layout</code>) which is the optimal
+      output from the network for this object. With digits
+      recognition, this function may take a digit <code>n</code> and return
+      <code>10x1</code> matrix of all zeros with exception for <code>n</code>-th element
+      which would be <code>1f0</code>.</li></ul>
+Default value for all transformation functions is <code>identity</code>.</div></div>
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">make-optimizer</code><code class="codex-lambda-list">(type network)</code><div class="codex-docstring">Make optimizer of type <code>type</code> for a network <code>network</code>.</div></div>
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">calculate</code><code class="codex-lambda-list">(neural-network object)</code><div class="codex-docstring">Calculate output from the network <code>neural-network</code> for the object
+<code>object</code>. The input transformation function (specified by
+<code>:input-trans</code> when creating a network) is applied to the <code>object</code>
+and the output transformation function (specified by
+<code>:output-trans</code>) is applied to output Nx1 matrix from the network.</div></div>
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">train-epoch</code><code class="codex-lambda-list">(neural-network generator &amp;key (optimizer (make-optimizer (quote sgd-optimizer) neural-network)) (learn-rate *learn-rate*) (decay-rate *decay-rate*) (minibatch-size *minibatch-size*))</code><div class="codex-docstring">Perform training of <code>neural-network</code> on every object returned
 by the generator <code>generator</code>. Each item returned by <code>generator</code>
-must be a cons pair containing an object which is passed to the neural
-network and its label. <code>input-trans%</code> and <code>label-trans</code> functions
-passed to <code>make-neural-network</code> are applied to <code>car</code> and <code>cdr</code>
-of each cons pair.</div></div>
-      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">rate</code><code class="codex-lambda-list">(neural-network generator &amp;key (test (function eql)))</code><div class="codex-docstring">Calculate accuracy of the <code>neural-network</code>(that is a ratio of
-correctly guessed samples to all samples) using testing data from
-the generator <code>generator</code>. Each item returned by <code>generator</code> must
-be a cons pair containing an object which is passed to the network and
-its label. <code>test</code> is a function used to compare the expected label
-and the actual one.</div></div>
+must be in the form <code>(data-object . label)</code> cons
+pair. <code>input-trans%</code> and <code>label-trans</code> functions passes to
+<code>make-neural-network</code> are applied to <code>car</code> and <code>cdr</code> of each
+pair respectively.</div></div>
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">rate</code><code class="codex-lambda-list">(neural-network generator &amp;key (test (function eql)))</code><div class="codex-docstring">Calculate accuracy of the <code>neural-network</code>(ratio of correctly
+guessed samples to all samples) using testing data from the generator
+<code>generator</code>. Each item returned by <code>generator</code> must be a cons pair
+in the form <code>(data-object . label)</code>, as with <code>train-epoch</code>
+function. <code>test</code> is a function used to compare the expected label
+with the label returned by the network.</div></div>
       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">idx-abs-max</code><code class="codex-lambda-list">(matrix)</code><div class="codex-docstring">Returns index of first element with maximal absolute value by
   calling isamax() function from BLAS. Works only for rows or
   columns.</div></div>

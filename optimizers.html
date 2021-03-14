@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+  Optimizers &ndash; neural-classifier
+</title>
+    <link rel="stylesheet" href="static/style.css"/>
+    
+  <link rel="stylesheet" href="static/highlight.css"/>
+  <script src="static/highlight.js"></script>
+  <style>
+   /* Highlight the current top-level TOC item, and hide the TOC of all other items */
+
+   .toc a[data-node="optimizers"] {
+       color: #AD3108;
+   }
+
+   .toc ol {
+       display: none;
+   }
+
+   .toc > ol {
+       display: block;
+   }
+
+   .toc li a[data-node="optimizers"] + ol {
+       display: block;
+   }
+
+   .toc li a[data-node="optimizers"] + ol li {
+       font-size: 16px;
+       margin: 0 10px;
+   }
+
+   .toc li a[active] + ol li:first-child {
+       margin-top: 5px;
+   }
+  </style>
+
+  </head>
+  <body>
+    
+  <h1 class="doc-title">neural-classifier » Optimizers</h1>
+  <article id="article" data-section="optimizers">
+    <aside>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+    </aside>
+    <main class="codex-section">
+      <p>
+   By default, <code>neural-classifier:train-epoch</code> uses stochastic gradient descent
+   (SGD) algorithm to minimize the cost function. There are other optimizers
+   which can be used in learn process. You can create an optimizer with
+   <code>neural-classifier:make-optimizer</code> function and pass it to
+   <code>neural-classifier:train-epoch</code> function. This is a list of optimizers. All
+   symbols are in <code>neural-classifier</code> package.</p><p>   </p><table><tr><td>Symbol</td>
+       <td>Optimizer</td>
+     </tr>
+     <tr><td><code>sgd-optimizer</code></td>
+       <td>SGD optimizer</td>
+     </tr>
+     <tr><td><code>momentum-optimizer</code></td>
+       <td>SGD with momentum</td>
+     </tr>
+     <tr><td><code>nesterov-optimizer</code></td>
+       <td>Nesterov accelerated gradient (NAG) optimizer</td>
+     </tr>
+     <tr><td><code>adagrad-optimizer</code></td>
+       <td>Adagrad optimizer</td>
+     </tr>
+     <tr><td><code>rmsprop-optimizer</code></td>
+       <td>RMSprop optimizer</td>
+     </tr>
+   </table><p>   Here is a plot showing how accuracy of classification of test data from
+   fashion MNIST set varies with the number of training epochs. Networks used in
+   this example have one hidden layer with 50 neurons. All activation functions
+   are sigmoids. Accuracy are averaged from 3 independent runs. Hyperparameters
+   used are <code>*learn-rate*</code> = 0.001, <code>*decay-rate*</code> = 0, <code>*minibatch-size*</code>
+   = 20, <code>*momentum-coeff*</code> = 0.9.
+   <img src="optimizers.png"/>
+</p>
+    </main>
+  </article>
+  <footer>
+    <div class="info">
+      Created with <a href="https://github.com/CommonDoc/codex">Codex</a>.
+    </div>
+  </footer>
+  <script>
+   HighlightLisp.highlight_auto();
+  </script>
+
+  </body>
+</html>
