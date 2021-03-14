@@ -14,7 +14,11 @@
                (:file "utility")
                (:file "optimizers")
                (:file "neural-network"))
-  :depends-on (:magicl :snakes :cl-randist))
+  :depends-on (:magicl :snakes :cl-randist)
+  :in-order-to ((test-op (load-op "neural-classifier/tests")))
+  :perform (test-op (op system)
+                    (declare (ignore op system))
+                    (uiop:symbol-call :neural-classifier-tests '#:run-tests)))
 
 (defsystem :neural-classifier/mnist
   :name :neural-classifier/mnist
@@ -27,3 +31,15 @@
   :components ((:file "package")
                (:file "mnist"))
   :depends-on (:neural-classifier :nibbles))
+
+(defsystem :neural-classifier/tests
+  :name :neural-classifier/tests
+  :version "0.1"
+  :author "Vasily Postnicov <shamaz.mazum at gmail dot com>"
+  :description "Recognition of handwritten digits based on MNIST/EMNIST datasets."
+  :licence "2-clause BSD"
+  :pathname "tests/"
+  :serial t
+  :components ((:file "package")
+               (:file "tests"))
+  :depends-on (:neural-classifier/mnist :fiveam))

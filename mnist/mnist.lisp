@@ -131,12 +131,11 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
    classifier
    (snakes:sequence->generator vector)))
 
-(defun train-epochs (classifier n)
+(defun train-epochs (classifier n
+                     &optional (optimizer-type 'neural-classifier:momentum-optimizer))
   "Train a neural network @c(classifier) for @c(n) epochs.
 Return a list of accuracy data for each epoch of training."
-  (loop with optimizer = (neural-classifier:make-optimizer
-                          'neural-classifier:momentum-optimizer
-                          classifier)
+  (loop with optimizer = (neural-classifier:make-optimizer optimizer-type classifier)
         repeat n
         collect
         (progn
