@@ -40,14 +40,22 @@
   (def-alien "tanh" 1)
   (def-alien "sqrt" 1))
 
+(defun print-condition-and-continue (c)
+  (princ c)
+  (terpri)
+  (continue))
+
 ;; Tell the compiler these functions are pure
 ;; (look at src/compiler/generic/vm-fndb.lisp in SBCL source code).
 
 ;; Additional hack is needed for these functions to be really flushable:
 ;; https://sourceforge.net/p/sbcl/mailman/message/37134684/
-(sb-c:defknown (%exp %tanh %sqrt)
-    (single-float) single-float
-    (sb-c:movable sb-c:flushable sb-c:foldable))
+(handler-bind
+    ;; KLUDGE: Provide clean foreced recompilation
+    ((simple-error #'print-condition-and-continue))
+  (sb-c:defknown (%exp %tanh %sqrt)
+      (single-float) single-float
+      (sb-c:movable sb-c:flushable sb-c:foldable)))
 
 ;; Define IR1 transformations from EXP to %EXP and so on.
 ;; (look at src/compiler/float-tran.lisp in SBCL source code).
