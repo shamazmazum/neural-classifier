@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Checkout Codex
         uses: actions/checkout@v2
         with:
@@ -29,6 +31,10 @@ jobs:
       - name: Build
         run: |
           cl -l neural-classifier -e '(uiop:quit)'
+      - name: Run tests
+        run: |
+          cd $GITHUB_WORKSPACE/mnist/dataset && gunzip *gz
+          cl -f $GITHUB_WORKSPACE/tests/actions.lisp
       - name: Build documentation
         run: |
           cl -l codex -e '(codex:document :neural-classifier :skip-undocumented t)'
