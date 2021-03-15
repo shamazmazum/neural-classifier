@@ -81,7 +81,7 @@
   (let ((image (opticl:coerce-image
                 (opticl:read-png-file pathname)
                 'opticl:gray-image))
-        (matrix (magicl:empty '(#.(* 50 50))
+        (matrix (magicl:empty '(#.(* 50 50) 1)
                               :type 'single-float)))
     ;; Convert simple array to magicl:matrix/single-float column
     (loop for i below (* 50 50) do
