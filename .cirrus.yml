@@ -12,6 +12,8 @@ task:
     - curl -L https://raw.githubusercontent.com/shamazmazum/cl-cirrus/master/install.sh | sh
     - git clone --depth=1 git://github.com/shamazmazum/codex.git ~/lisp/codex
     - git clone --depth=1 git://github.com/shamazmazum/docparser.git ~/lisp/docparser
+  ultralisp_script:
+    - cl -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
   script:
     - cl -l neural-classifier -e '(uiop:quit)'
     # - cl -l codex -e '(codex:document :neural-classifier :skip-undocumented t)'

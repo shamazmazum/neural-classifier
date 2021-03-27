@@ -25,9 +25,10 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install info install-info libblas-dev liblapack-dev
-      - name: Install CIM
+      - name: Install CIM and Ultralisp
         run: |
           curl -L https://raw.githubusercontent.com/shamazmazum/cl-cirrus/github-actions/install-actions.sh | sh
+          cl -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
       - name: Build
         run: |
           cl -l neural-classifier -e '(uiop:quit)'
