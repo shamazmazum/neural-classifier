@@ -14,7 +14,10 @@
                (:file "utility")
                (:file "optimizers")
                (:file "neural-network"))
-  :depends-on (:magicl :snakes :cl-randist)
+  :depends-on (:magicl/ext-blas
+               :magicl/ext-lapack
+               :snakes
+               :cl-randist)
   :in-order-to ((test-op (load-op "neural-classifier/tests")))
   :perform (test-op (op system)
                     (declare (ignore op system))

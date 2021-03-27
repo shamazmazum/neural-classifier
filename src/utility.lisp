@@ -10,6 +10,32 @@
     (float sigma 0d0))
    0f0))
 
+(defun idx-abs-max (matrix)
+  "Returns index of first element with maximal absolute value by
+  calling isamax() function from BLAS. Works only for rows or
+  columns."
+  (declare (type magicl:matrix/single-float matrix))
+  (let ((shape (magicl:shape matrix)))
+    (if (notany
+         (lambda (x)
+           (declare (type fixnum x))
+           (= x 1))
+         shape)
+        (error "This matrix is not a row or column.")))
+  (1- ; Transform fortran index to lisp index
+   (the fixnum
+        (magicl.blas-cffi:%isamax
+         (magicl:size matrix)
+         (magicl::storage matrix)
+         1))))
+
+(defun sasum (matrix)
+  (declare (type magicl:matrix/single-float matrix))
+  (magicl.blas-cffi:%sasum
+   (magicl:size matrix)
+   (magicl::storage matrix)
+   1))
+
 ;; Activation functions
 (defgeneric activation (vector type)
   (:documentation "Apply activation function TYPE to a VECTOR"))
@@ -73,24 +99,4 @@
 (defmethod activation (vector (type (eql :softmax)))
   (declare (type magicl:matrix/single-float vector))
   (let ((v% (magicl:map #'exp vector)))
-    (magicl:scale v% (/ (the single-float
-                             (magicl:sasum v%))))))
-
-(defun idx-abs-max (matrix)
-  "Returns index of first element with maximal absolute value by
-  calling isamax() function from BLAS. Works only for rows or
-  columns."
-  (declare (type magicl:matrix/single-float matrix))
-  (let ((shape (magicl:shape matrix)))
-    (if (notany
-         (lambda (x)
-           (declare (type fixnum x))
-           (= x 1))
-         shape)
-        (error "This matrix is not a row or column.")))
-  (1- ; Transform fortran index to lisp index
-   (the fixnum
-        (magicl.blas-cffi:%isamax
-         (magicl:size matrix)
-         (magicl::storage matrix)
-         1))))
+    (magicl:scale v% (/ (the single-float (sasum v%))))))
