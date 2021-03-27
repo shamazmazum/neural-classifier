@@ -73,10 +73,18 @@
              slightly different meaning)</td>
      </tr>
    </table><p>   
-      <div class="codex-error codex-no-node">No node with name <code>*learn-rate*</code>.</div>
-      <div class="codex-error codex-no-node">No node with name <code>*decay-rate*</code>.</div>
-      <div class="codex-error codex-no-node">No node with name <code>*minibatch-size*</code>.</div>
-      <div class="codex-error codex-no-node">No node with name <code>*momentum-coeff*</code>.</div>
+      <div class="codex-doc-node codex-variable"><code class="codex-name">*learn-rate*</code><div class="codex-docstring">Learning speed for gradient descent algorithms. Bigger values
+result in faster learning, but too big is bad. Default value is good
+for SGD, SGD with momentum and NAG optimizers. For Adagrad and
+RMSprop try 0.001f0.</div></div>
+      <div class="codex-doc-node codex-variable"><code class="codex-name">*decay-rate*</code><div class="codex-docstring">Regularization parameter <code>λ/N</code>, where <code>N</code> is the number of
+objects in the training set and <code>λ</code> must be about 1-10. If not sure,
+start with zero (which is the default).</div></div>
+      <div class="codex-doc-node codex-variable"><code class="codex-name">*minibatch-size*</code><div class="codex-docstring">Number of samples to be used for one update of network parameters.</div></div>
+      <div class="codex-doc-node codex-variable"><code class="codex-name">*momentum-coeff*</code><div class="codex-docstring">Hyperparameter for SGD optimizers which use momentum. Zero means
+just usual SGD. RMSprop also uses this parameter in accumulation of
+squared partial derivatives of network parameters. Good values are
+0.8-0.9.</div></div>
    
 </p>
     </main>
