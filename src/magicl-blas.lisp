@@ -1,6 +1,5 @@
 ;; These methods optimize matrix operation functions from magicl using BLAS.
-
-(export '(sasum))
+(in-package :magicl)
 
 (define-compiler-macro .+ (&whole form source1 source2 &optional target)
   (declare (ignore source2))
