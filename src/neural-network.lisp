@@ -14,11 +14,12 @@
 @item(@c(layout) is a list of positive integers which describes the
       amount of neurons in each layer (starting from input layer).)
 @item(@c(activation-funcs) is a list all the elements of which are
-      either @c(:sigmoid), @c(:tanh), @c(:abs), @c(:relu) or
-      @c(:softmax). The length of this list must be equal to the
-      length of @c(layout) minus one because the input layer does not
-      have an activation function. The last element cannot be @c(:abs)
-      or @c(:relu) and @c(:softmax) can only be the last element.)
+      either @c(:sigmoid), @c(:tanh), @c(:abs), @c(:relu),
+      @c(:softmax) or @c(:identity). The length of this list must be
+      equal to the length of @c(layout) minus one because the input
+      layer does not have an activation function. The last element
+      cannot be @c(:abs) or @c(:relu) and @c(:softmax) or
+      @c(:identity) can only be the last element.)
 @item(@c(input-trans) is a function which is applied to an object
       passed to @c(calculate) to transform it into an input column
       (that is a matrix with the type @c(magicl:matrix/single-float)
@@ -87,7 +88,8 @@ Default value for all transformation functions is @c(identity)."
         ((or (/= (length activation-funcs) n)
              (eq (car (last activation-funcs)) :abs)
              (eq (car (last activation-funcs)) :relu)
-             (find :softmax (butlast activation-funcs)))
+             (find :identity (butlast activation-funcs))
+             (find :softmax  (butlast activation-funcs)))
          (error "Incorrect activation functions"))))))
 
 ;; Normal work

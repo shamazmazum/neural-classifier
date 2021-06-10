@@ -100,3 +100,6 @@
   (declare (type magicl:matrix/single-float vector))
   (let ((v% (magicl:map #'exp vector)))
     (magicl:scale v% (/ (the single-float (sasum v%))))))
+
+(defmethod activation (vector (type (eql :identity)))
+  vector)
