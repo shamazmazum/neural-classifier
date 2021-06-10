@@ -60,11 +60,12 @@
       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">make-neural-network</code><code class="codex-lambda-list">(layout &amp;key input-trans output-trans input-trans% label-trans activation-funcs)</code><div class="codex-docstring">Create a new neural network.
 <ul><li><code>layout</code> is a list of positive integers which describes the
       amount of neurons in each layer (starting from input layer).</li><li><code>activation-funcs</code> is a list all the elements of which are
-      either <code>:sigmoid</code>, <code>:tanh</code>, <code>:abs</code>, <code>:relu</code> or
-      <code>:softmax</code>. The length of this list must be equal to the
-      length of <code>layout</code> minus one because the input layer does not
-      have an activation function. The last element cannot be <code>:abs</code>
-      or <code>:relu</code> and <code>:softmax</code> can only be the last element.</li><li><code>input-trans</code> is a function which is applied to an object
+      either <code>:sigmoid</code>, <code>:tanh</code>, <code>:abs</code>, <code>:relu</code>,
+      <code>:softmax</code> or <code>:identity</code>. The length of this list must be
+      equal to the length of <code>layout</code> minus one because the input
+      layer does not have an activation function. The last element
+      cannot be <code>:abs</code> or <code>:relu</code> and <code>:softmax</code> or
+      <code>:identity</code> can only be the last element.</li><li><code>input-trans</code> is a function which is applied to an object
       passed to <code>calculate</code> to transform it into an input column
       (that is a matrix with the type <code>magicl:matrix/single-float</code>
       and the shape <code>Nx1</code>, where <code>N</code> is the first number in the
