@@ -2,13 +2,23 @@
 
 (declaim (optimize (speed 3)))
 
-(defun random-normal (&key (mean 0f0) (sigma 0f0))
-  (declare (type single-float mean sigma))
-  (float
-   (cl-randist:random-normal
-    (float mean 0d0)
-    (float sigma 0d0))
-   0f0))
+(defun nrandom-generator (&key (sigma 1f0) (mean 0f0))
+  "Create a generator which generates normally(mean, sigma) distributed values"
+  (declare (type single-float sigma mean)
+           (optimize (speed 1)))
+  (let (acc)
+    (lambda ()
+      (when (null acc)
+        (let* ((u1 (random 1f0))
+               (u2 (random 1f0))
+               (n1 (* (sqrt (* -2f0 (log u1)))
+                      (cos (* 2f0 (float pi 0.0) u2))))
+               (n2 (* (sqrt (* -2f0 (log u1)))
+                      (sin (* 2f0 (float pi 0.0) u2)))))
+          (push n1 acc)
+          (push n2 acc)))
+      (let ((n (pop acc)))
+        (+ mean (* sigma n))))))
 
 (defun idx-abs-max (matrix)
   "Returns index of first element with maximal absolute value by

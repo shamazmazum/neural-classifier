@@ -16,8 +16,7 @@
                (:file "neural-network"))
   :depends-on (:magicl/ext-blas
                :magicl/ext-lapack
-               :snakes
-               :cl-randist)
+               :snakes)
   :in-order-to ((test-op (load-op "neural-classifier/tests")))
   :perform (test-op (op system)
                     (declare (ignore op system))
