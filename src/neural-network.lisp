@@ -381,11 +381,3 @@ with the label returned by the network."
                     (1+ total))
                    (float (/ hits total))))))
     (calculate-accuracy 0 0)))
-
-#+sbcl
-(progn
-  (format t "Disabling floating point traps~%")
-  (sb-int:set-floating-point-modes :traps '(:divide-by-zero)))
-#-sbcl
-(progn
-  (format t "You may wish to disable floating point traps, especially overflow~%"))
