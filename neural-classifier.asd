@@ -7,14 +7,13 @@
   :pathname "src/"
   :serial t
   :components ((:file "package")
-               #+sbcl
-               (:file "sbcl-hacks")
                (:file "magicl-blas")
                (:file "definitions")
                (:file "utility")
                (:file "optimizers")
                (:file "neural-network"))
-  :depends-on (:magicl/ext-blas
+  :depends-on ((:feature :single-float-tran :sbcl-single-float-tran)
+               :magicl/ext-blas
                :magicl/ext-lapack
                :snakes)
   :in-order-to ((test-op (load-op "neural-classifier/tests")))
