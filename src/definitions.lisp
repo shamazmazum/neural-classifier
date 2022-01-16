@@ -43,9 +43,6 @@
                      :documentation "Function which translates a label to a vector"))
   (:documentation "Class for neural networks"))
 
-(deftype non-negative-fixnum () '(integer 0 #.most-positive-fixnum))
-(deftype positive-fixnum () '(integer 1 #.most-positive-fixnum))
-
 (declaim (type single-float
                *learn-rate* *decay-rate*)
          (type positive-fixnum *minibatch-size*))

@@ -1,5 +1,5 @@
 (defpackage neural-classifier
-  (:use #:cl)
+  (:use #:cl #:alexandria)
   (:export #:neural-network
            #:neural-network-layout
            #:neural-network-input-trans
