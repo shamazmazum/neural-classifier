@@ -91,8 +91,9 @@ Abstact example: find a human face on photo.
    ;; Produce a matrix from a label
    :label-trans #'label-to-matrix
    ;; Activation fnctions: relu in the hidden layer, softmax in the
-   ;; output
-   :activation-funcs '(:relu :softmax)))
+   ;; output layer.
+   :activation-funcs (list (make-instance 'neural-classifier:leaky-relu :coeff 0.0)
+                           (make-instance 'neural-classifier:softmax))))
 
 (defun train-epochs (network n)
   "Train a network for n epochs"
@@ -207,6 +208,28 @@ recognition works.
    used are @c(*learn-rate*) = 0.001, @c(*decay-rate*) = 0, @c(*minibatch-size*)
    = 20, @c(*momentum-coeff*) = 0.9.
    @image[src=optimizers.png]()
+@end(section)
+
+@begin(section)
+   @title(Activation functions)
+   These activation functions are supported:
+
+   @cl:with-package[name="neural-classifier"](
+      @cl:doc(class sigmoid)
+      @cl:doc(class tanh%)
+      @cl:doc(class softmax)
+      @cl:doc(class leaky-relu)
+      @cl:doc(class identity%)
+   )
+
+   Activation functions differ in how they can be associated with layers of a
+   network. The division is as follows:
+
+   @cl:with-package[name="neural-classifier"](
+      @cl:doc(class activation)
+      @cl:doc(class hidden-layer-activation)
+      @cl:doc(class output-layer-activation)
+   )
 @end(section)
 
 @begin(section)

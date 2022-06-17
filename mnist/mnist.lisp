@@ -111,30 +111,31 @@
 (defun make-mnist-classifier (inner-neurons)
   "Make a neural network to classify digits from the MNIST
 dataset. @c(inner-neurons) is a number of neurons in the inner layer."
-  (neural-classifier:make-neural-network
+  (nc:make-neural-network
    (list #.(* 28 28) inner-neurons 10)
-   :input-trans%  (alex:compose #'possibly-invert #'add-noise)
-   :output-trans  #'neural-classifier:idx-abs-max
-   :label-trans   #'label-transform
-   :activation-funcs '(:abs :softmax)))
+   :input-trans%     (alex:compose #'possibly-invert #'add-noise)
+   :output-trans     #'nc:idx-abs-max
+   :label-trans      #'label-transform
+   :activation-funcs (list (make-instance 'nc:leaky-relu :coeff 0.2)
+                           (make-instance 'nc:softmax))))
 
 (defun train-epoch (classifier optimizer)
-  (neural-classifier:train-epoch
+  (nc:train-epoch
    classifier
    (snakes:sequence->generator
     (shuffle-vector *train-data*))
    :optimizer optimizer))
 
 (defun rate (classifier vector)
-  (neural-classifier:rate
+  (nc:rate
    classifier
    (snakes:sequence->generator vector)))
 
 (defun train-epochs (classifier n
-                     &optional (optimizer-type 'neural-classifier:momentum-optimizer))
+                     &optional (optimizer-type 'nc:momentum-optimizer))
   "Train a neural network @c(classifier) for @c(n) epochs.
 Return a list of accuracy data for each epoch of training."
-  (loop with optimizer = (neural-classifier:make-optimizer optimizer-type classifier)
+  (loop with optimizer = (nc:make-optimizer optimizer-type classifier)
         repeat n
         collect
         (progn

@@ -14,12 +14,11 @@
 @item(@c(layout) is a list of positive integers which describes the
       amount of neurons in each layer (starting from input layer).)
 @item(@c(activation-funcs) is a list all the elements of which are
-      either @c(:sigmoid), @c(:tanh), @c(:abs), @c(:relu),
-      @c(:softmax) or @c(:identity). The length of this list must be
+      objects of type @c(activation). The length of this list must be
       equal to the length of @c(layout) minus one because the input
       layer does not have an activation function. The last element
-      cannot be @c(:abs) or @c(:relu) and @c(:softmax) or
-      @c(:identity) can only be the last element.)
+      must be of type @c(output-layer-activation) and the all elements
+      but last must be of type @c(hidden-layer-activation).)
 @item(@c(input-trans) is a function which is applied to an object
       passed to @c(calculate) to transform it into an input column
       (that is a matrix with the type @c(magicl:matrix/single-float)
@@ -81,13 +80,13 @@ Default value for all transformation functions is @c(identity)."
       (cond
         ((null activation-funcs)
          (setf (neural-network-activation-funcs neural-network)
-               (loop repeat n collect :tanh)))
-        ((or (/= (length activation-funcs) n)
-             (eq (car (last activation-funcs)) :abs)
-             (eq (car (last activation-funcs)) :relu)
-             (find :identity (butlast activation-funcs))
-             (find :softmax  (butlast activation-funcs)))
-         (error "Incorrect activation functions"))))))
+               (loop repeat n collect (make-instance 'tanh%))))
+        ((not (and (= (length activation-funcs) n)
+                   (typep (car (last activation-funcs))
+                          'output-layer-activation)
+                   (every (rcurry #'typep 'hidden-layer-activation)
+                          (butlast activation-funcs))))
+         (error "Incorrect activation functions ~a" activation-funcs))))))
 
 ;; Normal work
 (defun calculate (neural-network object)
@@ -106,7 +105,7 @@ and the output transformation function (specified by
     (flet ((calculate-layer (input layer)
              (destructuring-bind (weights biases activation)
                  layer
-               (activation
+               (activate
                 (magicl:.+ (magicl:@ weights input)
                            biases)
                 activation))))
@@ -126,7 +125,7 @@ and the output transformation function (specified by
                  (destructuring-bind (weights biases activation)
                      (car layers)
                    (let* ((z (magicl:.+ (magicl:@ weights input) biases))
-                          (out (activation z activation)))
+                          (out (activate z activation)))
                      (accumulate-z-and-out
                       (cdr layers)
                       out
@@ -153,7 +152,7 @@ and the output transformation function (specified by
                      (car layer)
                    (backprop (cdr layer)
                              (cons
-                              (magicl:.* (activation-derivative z-l activation-l)
+                              (magicl:.* (|activate'| z-l activation-l)
                                          (magicl:mult w-l+1 (car acc) :transa :t))
                               acc)))
                  acc)))

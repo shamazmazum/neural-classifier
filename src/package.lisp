@@ -7,6 +7,16 @@
            #:neural-network-input-trans%
            #:neural-network-label-trans
 
+           ;; Activation functions
+           #:activation
+           #:hidden-layer-activation
+           #:output-layer-activation
+           #:sigmoid
+           #:tanh%
+           #:softmax
+           #:leaky-relu
+           #:identity%
+
            #:make-neural-network
            #:calculate
            #:train-epoch

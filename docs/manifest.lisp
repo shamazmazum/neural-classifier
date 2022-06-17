@@ -3,5 +3,5 @@
  :documents ((:title "neural-classifier"
               :authors ("Vasily Postnicov")
               :output-format (:type :multi-html
-                              :template :minima)
+                              :template :gamma)
               :sources ("manual.scr"))))
