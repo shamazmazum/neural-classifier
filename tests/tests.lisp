@@ -11,7 +11,7 @@
         neural-classifier:*decay-rate* (/ 10.0 50000)
         neural-classifier:*minibatch-size* 20)
 
-  (format t "*learn-rate*=~f *decay-rate*=~f~%*momentum-coeff*=~f *minibatch-size=~d~%"
+  (format t "*learn-rate*=~f *decay-rate*=~f~%*momentum-coeff*=~f *minibatch-size*=~d~%"
           neural-classifier:*learn-rate*
           neural-classifier:*decay-rate*
           neural-classifier:*momentum-coeff*
