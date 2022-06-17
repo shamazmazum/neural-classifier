@@ -12,20 +12,20 @@
 (defconstant +image-magic+ 2051)
 (defconstant +label-magic+ 2049)
 
-(defvar *labels*
-  (make-array
-   10
-   :initial-contents
-   (loop
-      for i below 10
-      for v = (magicl:zeros '(10 1) :type 'single-float)
-      do (setf (magicl:tref v i 0) 1.0)
-      collect v)))
+(alex:define-constant +labels+
+    (make-array 10
+                :initial-contents
+                (loop
+                      for i below 10
+                      for v = (magicl:zeros '(10 1) :type 'single-float)
+                      do (setf (magicl:tref v i 0) 1.0)
+                      collect v))
+  :test #'equalp)
 
 (defun label-transform (digit)
   (declare (optimize (speed 3))
            (type (integer 0 9) digit))
-  (svref *labels* digit))
+  (svref +labels+ digit))
 
 (defun read-labels (which)
   (let ((name (ecase which
@@ -70,7 +70,7 @@
         (map 'vector #'cons
              (read-images :test)
              (read-labels :test)))
-  t)
+  (values))
 
 (defun shuffle-vector (vector)
   (declare (optimize (speed 3))
@@ -90,12 +90,11 @@
   (declare (optimize (speed 3))
            (type magicl:matrix/single-float vector))
   (flet ((clamp (val min max)
-           (declare (type single-float val min max))
            (min (max val min) max)))
     (magicl:map
      (lambda (x)
        (declare (type single-float x))
-       (clamp (+ x (random 0.4f0) -0.2f0) 0f0 1f0))
+       (clamp (+ x (random 0.2f0) -0.1f0) 0f0 1f0))
      vector)))
 
 (defun possibly-invert (vector)
@@ -114,7 +113,7 @@
 dataset. @c(inner-neurons) is a number of neurons in the inner layer."
   (neural-classifier:make-neural-network
    (list #.(* 28 28) inner-neurons 10)
-   :input-trans%  #'possibly-invert
+   :input-trans%  (alex:compose #'possibly-invert #'add-noise)
    :output-trans  #'neural-classifier:idx-abs-max
    :label-trans   #'label-transform
    :activation-funcs '(:abs :softmax)))
@@ -143,8 +142,7 @@ Return a list of accuracy data for each epoch of training."
           (cons (rate classifier *train-data*)
                 (rate classifier *test-data*)))))
 
-(progn
-  (format t "Place MNIST dataset to ~a (controlled by ~a) and run ~a~%"
-          *mnist-dataset-path*
-          '*mnist-dataset-path*
-          'load-mnist-database))
+(format t "Place MNIST dataset to ~a (controlled by ~a) and run ~a~%"
+        *mnist-dataset-path*
+        '*mnist-dataset-path*
+        'load-mnist-database)
