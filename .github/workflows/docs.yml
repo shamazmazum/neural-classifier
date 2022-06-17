@@ -1,0 +1,44 @@
+name: Documentation
+
+on:
+  push:
+    branches: ['master']
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    env:
+      LISP: sbcl
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Checkout Codex
+        uses: actions/checkout@v2
+        with:
+          repository: shamazmazum/codex
+          path: ~/lisp/codex
+      - name: Checkout docparser
+        uses: actions/checkout@v2
+        with:
+          repository: shamazmazum/docparser
+          path: ~/lisp/docparser
+      - name: Install dependencies
+        run: |
+          sudo apt-get install info install-info libblas-dev liblapack-dev
+      - name: Install CIM and Ultralisp
+        run: |
+          curl -L https://raw.githubusercontent.com/shamazmazum/cl-cirrus/github-actions/install-actions.sh | sh
+          cl -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
+      - name: Build
+        run: |
+          cl -l neural-classifier -e '(uiop:quit)'
+      - name: Build documentation
+        run: |
+          cl -l codex -e '(codex:document :neural-classifier :skip-undocumented t)'
+      - name: Deploy to GH pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/neural-classifier/html
