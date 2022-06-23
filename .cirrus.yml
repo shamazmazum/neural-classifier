@@ -10,10 +10,10 @@ task:
     - pkg install -y curl git blas lapack
   install_script:
     - curl -L https://raw.githubusercontent.com/shamazmazum/cl-cirrus/master/install.sh | sh
-    - git clone --depth=1 git://github.com/shamazmazum/codex.git ~/lisp/codex
-    - git clone --depth=1 git://github.com/shamazmazum/docparser.git ~/lisp/docparser
   ultralisp_script:
     - cl -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
+  mnist_script:
+    - git submodule update --init
+    - cd mnist/dataset && gunzip -k *.gz
   script:
-    - cl -l neural-classifier -e '(uiop:quit)'
-    # - cl -l codex -e '(codex:document :neural-classifier :skip-undocumented t)'
+    - cl -l neural-classifier -f tests/actions.lisp
