@@ -15,15 +15,15 @@
    /* Highlight the current top-level TOC item, and hide the TOC of all other items */
 
    .toc a[data-node="hyper"] {
-       color: #AD3108;
+       /*color: #AD3108;*/
    }
 
    .toc ol {
        display: none;
    }
 
-   .toc > ol {
-       display: block;
+   .toc li a[data-node="hyper"] {
+       font-weight: bold;
    }
 
    .toc li a[data-node="hyper"] + ol {
@@ -31,25 +31,24 @@
    }
 
    .toc li a[data-node="hyper"] + ol li {
-       font-size: 16px;
-       margin: 0 10px;
-   }
-
-   .toc li a[active] + ol li:first-child {
-       margin-top: 5px;
+       margin-left: 10px;
    }
   </style>
 
   </head>
   <body>
     
-  <h1 class="doc-title">neural-classifier » Hyperparameters</h1>
+  <h1 class="doc-title">neural-classifier</h1>
   <article id="article" data-section="hyper">
     <aside>
-      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="activation-functions.html" data-node="activation-functions">Activation functions</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
     </aside>
     <main class="codex-section">
-      <p>
+      <header>
+        <h2 class="section-title">Hyperparameters</h2>
+      </header>
+      <div class="content">
+        <p>
    These hyperparameters are used in the library (<code>neural-classifier</code> package
    is omitted for brevity).</p><p>   </p><table><tr><td>Name</td>
        <td>Meaning</td>
@@ -87,6 +86,7 @@ squared partial derivatives of network parameters. Good values are
 0.8-0.9.</div></div>
    
 </p>
+      </div>
     </main>
   </article>
   <footer>

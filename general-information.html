@@ -15,15 +15,15 @@
    /* Highlight the current top-level TOC item, and hide the TOC of all other items */
 
    .toc a[data-node="general-information"] {
-       color: #AD3108;
+       /*color: #AD3108;*/
    }
 
    .toc ol {
        display: none;
    }
 
-   .toc > ol {
-       display: block;
+   .toc li a[data-node="general-information"] {
+       font-weight: bold;
    }
 
    .toc li a[data-node="general-information"] + ol {
@@ -31,25 +31,24 @@
    }
 
    .toc li a[data-node="general-information"] + ol li {
-       font-size: 16px;
-       margin: 0 10px;
-   }
-
-   .toc li a[active] + ol li:first-child {
-       margin-top: 5px;
+       margin-left: 10px;
    }
   </style>
 
   </head>
   <body>
     
-  <h1 class="doc-title">neural-classifier » General information</h1>
+  <h1 class="doc-title">neural-classifier</h1>
   <article id="article" data-section="general-information">
     <aside>
-      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="activation-functions.html" data-node="activation-functions">Activation functions</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
     </aside>
     <main class="codex-section">
-      <p>
+      <header>
+        <h2 class="section-title">General information</h2>
+      </header>
+      <div class="content">
+        <p>
    Typical neural network lifecycle is the following:
    </p><ol><li>Adjust hyperparameters if you want. See
             <a id="hyper" href="hyper.html" data-node="hyper">Hyperparameters</a> section for details. Default values
@@ -119,8 +118,9 @@
    ;; Produce a matrix from a label
    :label-trans #'label-to-matrix
    ;; Activation fnctions: relu in the hidden layer, softmax in the
-   ;; output
-   :activation-funcs '(:relu :softmax)))
+   ;; output layer.
+   :activation-funcs (list (make-instance 'neural-classifier:leaky-relu :coeff 0.0)
+                           (make-instance 'neural-classifier:softmax))))
 
 (defun train-epochs (network n)
   &quot;Train a network for n epochs&quot;
@@ -147,6 +147,7 @@
 </code></pre><p>If you want another example, look at <code>mnist/mnist.lisp</code> to see how digit
 recognition works.
 </p>
+      </div>
     </main>
   </article>
   <footer>

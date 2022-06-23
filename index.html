@@ -15,15 +15,15 @@
    /* Highlight the current top-level TOC item, and hide the TOC of all other items */
 
    .toc a[data-node="index"] {
-       color: #AD3108;
+       /*color: #AD3108;*/
    }
 
    .toc ol {
        display: none;
    }
 
-   .toc > ol {
-       display: block;
+   .toc li a[data-node="index"] {
+       font-weight: bold;
    }
 
    .toc li a[data-node="index"] + ol {
@@ -31,31 +31,31 @@
    }
 
    .toc li a[data-node="index"] + ol li {
-       font-size: 16px;
-       margin: 0 10px;
-   }
-
-   .toc li a[active] + ol li:first-child {
-       margin-top: 5px;
+       margin-left: 10px;
    }
   </style>
 
   </head>
   <body>
     
-  <h1 class="doc-title">neural-classifier » Overview</h1>
+  <h1 class="doc-title">neural-classifier</h1>
   <article id="article" data-section="index">
     <aside>
-      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="activation-functions.html" data-node="activation-functions">Activation functions</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
     </aside>
     <main class="codex-section">
-      
+      <header>
+        <h2 class="section-title">Overview</h2>
+      </header>
+      <div class="content">
+        
    <code>neural-classifier</code> is a library for working with neural networks and
    solving classification problem (and maybe other problems). For a basic use
    read README file on the
    <a href="http://github.com/shamazmazum/neural-classifier">GitHub page</a>.
    Here the API is described in more details.
 
+      </div>
     </main>
   </article>
   <footer>

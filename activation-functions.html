@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+  Activation functions &ndash; neural-classifier
+</title>
+    <link rel="stylesheet" href="static/style.css"/>
+    
+  <link rel="stylesheet" href="static/highlight.css"/>
+  <script src="static/highlight.js"></script>
+  <style>
+   /* Highlight the current top-level TOC item, and hide the TOC of all other items */
+
+   .toc a[data-node="activation-functions"] {
+       /*color: #AD3108;*/
+   }
+
+   .toc ol {
+       display: none;
+   }
+
+   .toc li a[data-node="activation-functions"] {
+       font-weight: bold;
+   }
+
+   .toc li a[data-node="activation-functions"] + ol {
+       display: block;
+   }
+
+   .toc li a[data-node="activation-functions"] + ol li {
+       margin-left: 10px;
+   }
+  </style>
+
+  </head>
+  <body>
+    
+  <h1 class="doc-title">neural-classifier</h1>
+  <article id="article" data-section="activation-functions">
+    <aside>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="activation-functions.html" data-node="activation-functions">Activation functions</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+    </aside>
+    <main class="codex-section">
+      <header>
+        <h2 class="section-title">Activation functions</h2>
+      </header>
+      <div class="content">
+        <p>
+   These activation functions are supported:</p><p>   
+      <div class="codex-doc-node codex-record codex-class"><code class="codex-name">sigmoid</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(hidden-layer-activation output-layer-activation t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Sigmoid activation function.</div><ul class="codex-slot-list"></ul></div>
+      <div class="codex-doc-node codex-record codex-class"><code class="codex-name">tanh%</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(hidden-layer-activation output-layer-activation t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Hyberbolic tangent activation function.</div><ul class="codex-slot-list"></ul></div>
+      <div class="codex-doc-node codex-record codex-class"><code class="codex-name">softmax</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(output-layer-activation t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Softmax activation function.</div><ul class="codex-slot-list"></ul></div>
+      <div class="codex-doc-node codex-record codex-class"><code class="codex-name">leaky-relu</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(hidden-layer-activation t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Leaky ReLU activation function. It returns its
+argument when it is greater than zero or the argument multiplied by
+<code>coeff</code> otherwise.</div><ul class="codex-slot-list"><li class="codex-slot codex-class-slot"><code class="codex-name">coeff</code><div class="codex-docstring"></div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initarg:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">:coeff</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initform:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">0.0</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Readers:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(leaky-relu-coeff)</code></td></tr></table></div></li></ul></div>
+      <div class="codex-doc-node codex-record codex-class"><code class="codex-name">identity%</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(output-layer-activation t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Identity activation function (does nothing on its
+input).</div><ul class="codex-slot-list"></ul></div>
+   </p><p>   Activation functions differ in how they can be associated with layers of a
+   network. The division is as follows:</p><p>   
+      <div class="codex-doc-node codex-record codex-class"><code class="codex-name">activation</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Generic class for activation functions. Not to be
+instantiated.</div><ul class="codex-slot-list"></ul></div>
+      <div class="codex-doc-node codex-record codex-class"><code class="codex-name">hidden-layer-activation</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(activation t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Generic class for activation functions associated
+with hidden layers. Not to be instantiated.</div><ul class="codex-slot-list"></ul></div>
+      <div class="codex-doc-node codex-record codex-class"><code class="codex-name">output-layer-activation</code><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-header-cell">Option</td><td class="codex-class-struct-slot-option-header-cell">Value</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Superclasses:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(activation t)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Metaclass:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">standard-class</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Default Initargs:</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr></table></div><div class="codex-docstring">Generic class for activation functions associated
+with an output layer. Not to be instantiated.</div><ul class="codex-slot-list"></ul></div>
+   
+</p>
+      </div>
+    </main>
+  </article>
+  <footer>
+    <div class="info">
+      Created with <a href="https://github.com/CommonDoc/codex">Codex</a>.
+    </div>
+  </footer>
+  <script>
+   HighlightLisp.highlight_auto();
+  </script>
+
+  </body>
+</html>
