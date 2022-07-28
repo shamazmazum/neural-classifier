@@ -1,8 +1,5 @@
 (in-package :neural-classifier)
 
-(deftype activation-symbol ()
-  '(member :sigmoid :tanh :abs :relu :softmax))
-
 (defclass neural-network ()
   ((layout           :initarg       :layout
                      :initform      (error "Specify number of neurons in each layer")
