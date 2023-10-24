@@ -75,7 +75,8 @@ a {
 }
 
 .content p code,
-.content li code{
+.content li code,
+.content .codex-docstring code {
     font-size: 16px;
     background: #f0f0f0;
 }
