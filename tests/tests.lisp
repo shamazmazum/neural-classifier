@@ -34,7 +34,9 @@
            (let* ((net (neural-classifier-mnist:make-mnist-classifier 25))
                   (final-results (second
                                   (let ((*standard-output* (make-broadcast-stream)))
-                                    (neural-classifier-mnist:train-epochs net 2 optimizer)))))
+                                    (neural-classifier-mnist:train-epochs
+                                     net 2
+                                     (neural-classifier:make-optimizer optimizer net))))))
              ;; Check that final recognition rates for train and test
              ;; sets are > a, where a is some number > 0.1
              (is (> (car final-results) 0.6))
