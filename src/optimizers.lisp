@@ -16,11 +16,7 @@ be a small positive value."))
   ((weights       :type list
                   :accessor optimizer-weights)
    (biases        :type list
-                  :accessor optimizer-biases)
-   (initial-value :type single-float
-                  :accessor optimizer-initial-value
-                  :initarg :initial-value
-                  :initform 0f0))
+                  :accessor optimizer-biases))
   (:documentation "Optimizer which memoizes some old state related to
 weights and biases. Not to be instantiated."))
 
@@ -38,8 +34,6 @@ momentum"))
 
 (defclass adagrad-optimizer (memoizing-optimizer)
   ()
-  (:default-initargs
-   :initial-value 1f-8)
   (:documentation "Adagrad optimizer"))
 
 (defclass rmsprop-optimizer (memoizing-optimizer)
@@ -47,8 +41,6 @@ momentum"))
             :accessor momentum-coeff
             :initarg :coeff
             :initform *momentum-coeff*))
-  (:default-initargs
-   :initial-value 1f-8)
   (:documentation "RMSprop optimizer"))
 
 (defgeneric learn (optimizer neural-network samples)
@@ -63,14 +55,12 @@ momentum"))
     (setf (optimizer-weights optimizer)
           (loop for m in (neural-network-weights network)
                 collect (magicl:const
-                         (optimizer-initial-value optimizer)
-                         (magicl:shape m)
+                         0f0 (magicl:shape m)
                          :type 'single-float))
           (optimizer-biases optimizer)
           (loop for m in (neural-network-biases network)
                 collect (magicl:const
-                         (optimizer-initial-value optimizer)
-                         (magicl:shape m)
+                         0f0 (magicl:shape m)
                          :type 'single-float)))))
 
 (defmethod learn ((optimizer sgd-optimizer) neural-network samples)
@@ -147,7 +137,7 @@ momentum"))
               x
               (magicl:./
                (magicl:scale delta-x learning-rate)
-               (magicl:map #'sqrt accumulated-x))
+               (magicl:map #'sqrt (magicl:.+ accumulated-x 1f-12)))
               x)))
       (multiple-value-bind (delta-weight delta-bias)
           (calculate-gradient-minibatch neural-network samples)
@@ -172,7 +162,7 @@ momentum"))
               x
               (magicl:./
                (magicl:scale delta-x learning-rate)
-               (magicl:map #'sqrt accumulated-x))
+               (magicl:map #'sqrt (magicl:.+ accumulated-x 1f-12)))
               x)))
       (multiple-value-bind (delta-weight delta-bias)
           (calculate-gradient-minibatch neural-network samples)
