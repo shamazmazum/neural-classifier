@@ -25,13 +25,13 @@
            #:idx-abs-max
 
            #:sgd-optimizer
+           #:memoizing-optimizer
            #:momentum-optimizer
            #:nesterov-optimizer
            #:adagrad-optimizer
            #:rmsprop-optimizer
-           #:make-optimizer
 
            #:*momentum-coeff*
-           #:*learn-rate*
+           #:*learning-rate*
            #:*decay-rate*
            #:*minibatch-size*))

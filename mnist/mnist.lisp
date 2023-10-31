@@ -133,7 +133,8 @@ dataset. @c(inner-neurons) is a number of neurons in the inner layer."
 
 (defun train-epochs (classifier n
                      &optional (optimizer
-                                (nc:make-optimizer 'nc:momentum-optimizer classifier)))
+                                (make-instance 'nc:momentum-optimizer
+                                               :neural-network classifier)))
   "Train a neural network @c(classifier) for @c(n) epochs.
 Return a list of accuracy data for each epoch of training."
   (loop repeat n collect

@@ -41,9 +41,9 @@
   (:documentation "Class for neural networks"))
 
 (declaim (type single-float
-               *learn-rate* *decay-rate*)
+               *learning-rate* *decay-rate*)
          (type positive-fixnum *minibatch-size*))
-(defparameter *learn-rate* 0.005f0
+(defparameter *learning-rate* 0.005f0
   "Learning speed for gradient descent algorithms. Bigger values
 result in faster learning, but too big is bad. Default value is good
 for SGD, SGD with momentum and NAG optimizers. For Adagrad and

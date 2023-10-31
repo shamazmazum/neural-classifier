@@ -135,7 +135,7 @@ recognition works.
        @cell(Where/when used)
      @end(row)
      @begin(row)
-       @cell(@c(*learn-rate*))
+       @cell(@c(*learning-rate*))
        @cell(How fast the network learns)
        @cell(While training with all optimizers)
      @end(row)
@@ -158,7 +158,7 @@ recognition works.
    @end(table)
 
    @cl:with-package[name="neural-classifier"](
-      @cl:doc(variable *learn-rate*)
+      @cl:doc(variable *learning-rate*)
       @cl:doc(variable *decay-rate*)
       @cl:doc(variable *minibatch-size*)
       @cl:doc(variable *momentum-coeff*)
@@ -169,8 +169,9 @@ recognition works.
    @title(Optimizers)
    By default, @c(neural-classifier:train-epoch) uses stochastic gradient descent
    (SGD) algorithm to minimize the cost function. There are other optimizers
-   which can be used in learn process. You can create an optimizer with
-   @c(neural-classifier:make-optimizer) function and pass it to
+   which can be used in learn process. You can create an optimizer by
+   instantiating of of the optimizer classes (which are subclasses of
+   @c(neural-classifier:optimizer) and pass it to
    @c(neural-classifier:train-epoch) function. This is a list of optimizers. All
    symbols are in @c(neural-classifier) package.
 
@@ -205,7 +206,7 @@ recognition works.
    fashion MNIST set varies with the number of training epochs. Networks used in
    this example have one hidden layer with 50 neurons. All activation functions
    are sigmoids. Accuracy are averaged from 3 independent runs. Hyperparameters
-   used are @c(*learn-rate*) = 0.001, @c(*decay-rate*) = 0, @c(*minibatch-size*)
+   used are @c(*learning-rate*) = 0.001, @c(*decay-rate*) = 0, @c(*minibatch-size*)
    = 20, @c(*momentum-coeff*) = 0.9.
    @image[src=optimizers.png]()
 @end(section)

@@ -218,8 +218,7 @@ and the output transformation function (specified by
 
 (defun train-epoch (neural-network generator
                     &key
-                      (optimizer (make-optimizer 'sgd-optimizer neural-network))
-                      (learn-rate *learn-rate*)
+                      (optimizer (make-instance 'sgd-optimizer))
                       (decay-rate *decay-rate*)
                       (minibatch-size *minibatch-size*))
   "Perform training of @c(neural-network) on every object returned
@@ -228,13 +227,12 @@ must be in the form @c((data-object . label)) cons
 pair. @c(input-trans%) and @c(label-trans) functions passes to
 @c(make-neural-network) are applied to @c(car) and @c(cdr) of each
 pair respectively."
-  (declare (type single-float learn-rate decay-rate)
+  (declare (type single-float decay-rate)
            (type neural-network neural-network)
            (type positive-fixnum minibatch-size)
            (type snakes:basic-generator generator)
            (type optimizer optimizer))
-  (let ((*learn-rate* learn-rate)
-        (*decay-rate* decay-rate)
+  (let ((*decay-rate* decay-rate)
         (*minibatch-size* minibatch-size))
     (loop
        for minibatch-samples =
