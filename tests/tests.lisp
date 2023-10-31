@@ -10,7 +10,7 @@
   (setq neural-classifier:*decay-rate* (/ 10.0 50000)
         neural-classifier:*minibatch-size* 20)
 
-  (format t "*decay-rate*=~f~%*momentum-coeff*=~f *minibatch-size*=~d~%"
+  (format t "*decay-rate*=~f *momentum-coeff*=~f *minibatch-size*=~d~%"
           neural-classifier:*decay-rate*
           neural-classifier:*momentum-coeff*
           neural-classifier:*minibatch-size*)

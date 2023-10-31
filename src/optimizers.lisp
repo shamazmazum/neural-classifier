@@ -1,12 +1,25 @@
 (in-package :neural-classifier)
 
 (defclass optimizer ()
-  ((learning-rate :type single-float
-                 :reader optimizer-learning-rate
-                 :initarg :learning-rate
-                 :initform *learning-rate*
-                 :documentation "Learning rate of the optimizer. Must
-be a small positive value."))
+  ((learning-rate  :type          single-float
+                   :reader        optimizer-learning-rate
+                   :initarg       :learning-rate
+                   :initform      *learning-rate*
+                   :documentation "Learning rate of the
+optimizer. Must be a small positive value.")
+   (minibatch-size :type          positive-fixnum
+                   :reader        optimizer-minibatch-size
+                   :initarg       :minibatch-size
+                   :initform      *minibatch-size*
+                   :documentation "Minibatch size hyperparameter used
+for learing. An integer in the range 10-100 is good.")
+   (decay-rate     :type          single-float
+                   :reader        optimizer-decay-rate
+                   :initarg       :decay-rate
+                   :initform      *decay-rate*
+                   :documentation "A parameter used for L²
+regularization. 0.0 is no regularization. Good values are 1-10 divided
+by the dataset size."))
   (:documentation "Generic optimizer class. Not to be instantiated"))
 
 (defclass sgd-optimizer (optimizer) ()
@@ -64,11 +77,12 @@ momentum"))
                          :type 'single-float)))))
 
 (defmethod learn ((optimizer sgd-optimizer) neural-network samples)
-  (let ((learning-rate (optimizer-learning-rate optimizer)))
+  (let ((learning-rate (optimizer-learning-rate optimizer))
+        (decay-rate    (optimizer-decay-rate    optimizer)))
     (flet ((update (x delta-x)
              (magicl:.- x (magicl:scale delta-x learning-rate) x)))
       (multiple-value-bind (delta-weight delta-bias)
-          (calculate-gradient-minibatch neural-network samples)
+          (calculate-gradient-minibatch neural-network samples decay-rate)
         (let ((weights (neural-network-weights neural-network))
               (biases  (neural-network-biases  neural-network)))
           (mapc #'update weights delta-weight)
@@ -76,14 +90,15 @@ momentum"))
   (values))
 
 (defmethod learn ((optimizer momentum-optimizer) neural-network samples)
-  (let ((learning-rate (optimizer-learning-rate optimizer)))
+  (let ((learning-rate (optimizer-learning-rate optimizer))
+        (decay-rate    (optimizer-decay-rate    optimizer)))
     (flet ((update (x delta-x accumulated-x)
              (magicl:.+ (magicl:scale delta-x learning-rate)
                         (magicl:scale accumulated-x (momentum-coeff optimizer))
                         accumulated-x)
              (magicl:.- x accumulated-x x)))
       (multiple-value-bind (delta-weight delta-bias)
-          (calculate-gradient-minibatch neural-network samples)
+          (calculate-gradient-minibatch neural-network samples decay-rate)
         (let ((weights (neural-network-weights neural-network))
               (biases  (neural-network-biases  neural-network))
               (acc-weights (optimizer-weights optimizer))
@@ -93,7 +108,8 @@ momentum"))
   (values))
 
 (defmethod learn ((optimizer nesterov-optimizer) neural-network samples)
-  (let ((learning-rate (optimizer-learning-rate optimizer)))
+  (let ((learning-rate (optimizer-learning-rate optimizer))
+        (decay-rate    (optimizer-decay-rate    optimizer)))
     (flet ((step1 (x accumulated-x)
              ;; Change weights & biases by accumulated value.
              ;; (Predict values for weights & biases).
@@ -116,7 +132,7 @@ momentum"))
         (mapc #'step1 biases  acc-biases)
         ;; Calculate gradient at predicted point
         (multiple-value-bind (delta-weight delta-bias)
-            (calculate-gradient-minibatch neural-network samples)
+            (calculate-gradient-minibatch neural-network samples decay-rate)
           ;; Calculate the final position
           (mapc #'step2 weights-copy delta-weight acc-weights)
           (mapc #'step2 biases-copy  delta-bias   acc-biases))
@@ -127,7 +143,8 @@ momentum"))
   (values))
 
 (defmethod learn ((optimizer adagrad-optimizer) neural-network samples)
-  (let ((learning-rate (optimizer-learning-rate optimizer)))
+  (let ((learning-rate (optimizer-learning-rate optimizer))
+        (decay-rate    (optimizer-decay-rate    optimizer)))
     (flet ((update (x delta-x accumulated-x)
              (magicl:.+
               (magicl:.* delta-x delta-x)
@@ -140,7 +157,7 @@ momentum"))
                (magicl:map #'sqrt (magicl:.+ accumulated-x 1f-12)))
               x)))
       (multiple-value-bind (delta-weight delta-bias)
-          (calculate-gradient-minibatch neural-network samples)
+          (calculate-gradient-minibatch neural-network samples decay-rate)
         (let ((weights (neural-network-weights neural-network))
               (biases  (neural-network-biases  neural-network))
               (acc-weights (optimizer-weights optimizer))
@@ -150,7 +167,8 @@ momentum"))
   (values))
 
 (defmethod learn ((optimizer rmsprop-optimizer) neural-network samples)
-  (let ((learning-rate (optimizer-learning-rate optimizer)))
+  (let ((learning-rate (optimizer-learning-rate optimizer))
+        (decay-rate    (optimizer-decay-rate    optimizer)))
     (flet ((update (x delta-x accumulated-x)
              (let ((coeff (momentum-coeff optimizer)))
                (declare (type single-float coeff))
@@ -165,7 +183,7 @@ momentum"))
                (magicl:map #'sqrt (magicl:.+ accumulated-x 1f-12)))
               x)))
       (multiple-value-bind (delta-weight delta-bias)
-          (calculate-gradient-minibatch neural-network samples)
+          (calculate-gradient-minibatch neural-network samples decay-rate)
         (let ((weights (neural-network-weights neural-network))
               (biases  (neural-network-biases  neural-network))
               (acc-weights (optimizer-weights optimizer))

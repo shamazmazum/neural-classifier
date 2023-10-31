@@ -187,58 +187,54 @@ and the output transformation function (specified by
            (mapcar #'weight-grad output delta) ;; Weights
            delta))))))                         ;; Biases
 
-(defun calculate-gradient-minibatch (neural-network samples)
+(defun calculate-gradient-minibatch (neural-network samples decay-rate)
   "Calculate gradient of the cost function based on multiple input samples"
-  (declare (type list samples))
-  (flet ((sum-matrices (matrices1 matrices2)
-           (mapc #'magicl:.+
-                 matrices1
-                 matrices2
-                 matrices2))
-         (final-weights (x grad-x)
-           (magicl:.+ (magicl:scale grad-x (/ (float *minibatch-size*)))
-                      (magicl:scale x *decay-rate*)))
-         (final-biases (grad-x)
-           (magicl:scale grad-x (/ (float *minibatch-size*)))))
+  (declare (type list samples)
+           (type single-float decay-rate))
+  (let ((scale (/ (float (length samples)))))
+    (flet ((sum-matrices (matrices1 matrices2)
+             (mapc #'magicl:.+
+                   matrices1
+                   matrices2
+                   matrices2))
+           (final-weights (x grad-x)
+             (magicl:.+ (magicl:scale grad-x scale)
+                        (magicl:scale x decay-rate)))
+           (final-biases (grad-x)
+             (magicl:scale grad-x scale)))
 
-    (multiple-value-bind (weights biases)
-        (calculate-gradient neural-network (car samples))
-      (loop
-        for sample in (cdr samples) do
-          (multiple-value-bind (delta-weight delta-bias)
-              (calculate-gradient neural-network sample)
-            (sum-matrices delta-weight weights)
-            (sum-matrices delta-bias   biases)))
+      (multiple-value-bind (weights biases)
+          (calculate-gradient neural-network (car samples))
+        (loop
+              for sample in (cdr samples) do
+              (multiple-value-bind (delta-weight delta-bias)
+                  (calculate-gradient neural-network sample)
+                (sum-matrices delta-weight weights)
+                (sum-matrices delta-bias   biases)))
 
-      (values
-       (mapcar #'final-weights
-               (neural-network-weights neural-network)
-               weights)
-       (mapcar #'final-biases biases)))))
+        (values
+         (mapcar #'final-weights
+                 (neural-network-weights neural-network)
+                 weights)
+         (mapcar #'final-biases biases))))))
 
 (defun train-epoch (neural-network generator
-                    &key
-                      (optimizer (make-instance 'sgd-optimizer))
-                      (decay-rate *decay-rate*)
-                      (minibatch-size *minibatch-size*))
+                    &key (optimizer (make-instance 'sgd-optimizer)))
   "Perform training of @c(neural-network) on every object returned
 by the generator @c(generator). Each item returned by @c(generator)
 must be in the form @c((data-object . label)) cons
 pair. @c(input-trans%) and @c(label-trans) functions passes to
 @c(make-neural-network) are applied to @c(car) and @c(cdr) of each
 pair respectively."
-  (declare (type single-float decay-rate)
-           (type neural-network neural-network)
-           (type positive-fixnum minibatch-size)
+  (declare (type neural-network neural-network)
            (type snakes:basic-generator generator)
            (type optimizer optimizer))
-  (let ((*decay-rate* decay-rate)
-        (*minibatch-size* minibatch-size))
+  (let ((minibatch-size (optimizer-minibatch-size optimizer)))
     (loop
        for minibatch-samples =
-         (snakes:take *minibatch-size* generator
+         (snakes:take minibatch-size generator
                       :fail-if-short nil)
-       for i fixnum from 0 by *minibatch-size*
+       for i fixnum from 0 by minibatch-size
        while minibatch-samples
        do
          (learn optimizer neural-network minibatch-samples)
