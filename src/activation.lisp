@@ -24,9 +24,11 @@ with hidden layers. Not to be instantiated."))
 with an output layer. Not to be instantiated."))
 
 ;; Sigmoid
+(sera:-> σ (single-float)
+         (values (single-float 0.0 1.0) &optional))
 (defun σ (z)
   "Sigmoid activation function."
-  (declare (type single-float z))
+  #.(declare-optimizations)
   (/ (1+ (exp (- z)))))
 
 (defclass sigmoid (hidden-layer-activation
@@ -35,11 +37,11 @@ with an output layer. Not to be instantiated."))
   (:documentation "Sigmoid activation function."))
 
 (defmethod activate (vector (activation sigmoid))
-  (declare (type magicl:matrix/single-float vector))
+  #.(declare-optimizations)
   (magicl:map #'σ vector))
 
 (defmethod |activate'| (vector (activation sigmoid))
-  (declare (type magicl:matrix/single-float vector))
+  #.(declare-optimizations)
   (magicl:map
    (lambda (z)
      (let ((σ (σ z)))
@@ -47,36 +49,38 @@ with an output layer. Not to be instantiated."))
    vector))
 
 ;; TANH
-(defclass tanh% (hidden-layer-activation
+(defclass %tanh (hidden-layer-activation
                  output-layer-activation)
   ()
   (:documentation "Hyberbolic tangent activation function."))
 
-(defmethod activate (vector (activation tanh%))
-  (declare (type magicl:matrix/single-float vector))
+(defmethod activate (vector (activation %tanh))
+  #.(declare-optimizations)
   (magicl:map #'tanh vector))
 
-(defmethod |activate'| (vector (activation tanh%))
-  (declare (type magicl:matrix/single-float vector))
+(defmethod |activate'| (vector (activation %tanh))
+  #.(declare-optimizations)
   (magicl:map
    (lambda (z)
      (declare (type single-float z))
-     (let ((t% (tanh z)))
-       (* (1+ t%) (- 1.0 t%))))
+     (let ((%t (tanh z)))
+       (* (1+ %t) (- 1.0 %t))))
    vector))
 
 ;; Leaky ReLU
 (defclass leaky-relu (hidden-layer-activation)
   ((coeff :initarg  :coeff
           :initform 0f0
+          :type     single-float
           :reader   leaky-relu-coeff))
   (:documentation "Leaky ReLU activation function. It returns its
 argument when it is greater than zero or the argument multiplied by
 @c(coeff) otherwise."))
 
 (defmethod activate (vector (activation leaky-relu))
-  (declare (type magicl:matrix/single-float vector))
+  #.(declare-optimizations)
   (let ((coeff (leaky-relu-coeff activation)))
+    (declare (type single-float coeff))
     (magicl:map
      (lambda (z)
        (declare (type single-float z))
@@ -84,8 +88,9 @@ argument when it is greater than zero or the argument multiplied by
      vector)))
 
 (defmethod |activate'| (vector (activation leaky-relu))
-  (declare (type magicl:matrix/single-float vector))
+  #.(declare-optimizations)
   (let ((coeff (leaky-relu-coeff activation)))
+    (declare (type single-float coeff))
     (magicl:map
      (lambda (z)
        (declare (type single-float z))
@@ -98,15 +103,15 @@ argument when it is greater than zero or the argument multiplied by
   (:documentation "Softmax activation function."))
 
 (defmethod activate (vector (activation softmax))
-  (declare (type magicl:matrix/single-float vector))
-  (let ((v% (magicl:map #'exp vector)))
-    (magicl:scale v% (/ (the single-float (sasum v%))))))
+  #.(declare-optimizations)
+  (let ((v (magicl:map #'exp vector)))
+    (magicl:scale v (/ (sasum v)))))
 
 ;; Identity
-(defclass identity% (output-layer-activation)
+(defclass %identity (output-layer-activation)
   ()
   (:documentation "Identity activation function (does nothing on its
 input)."))
 
-(defmethod activate (vector (activation identity%))
+(defmethod activate (vector (activation %identity))
   vector)

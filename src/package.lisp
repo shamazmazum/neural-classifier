@@ -1,5 +1,6 @@
 (defpackage neural-classifier
   (:use #:cl #:alexandria)
+  (:local-nicknames (#:sera #:serapeum))
   (:export #:neural-network
            #:neural-network-layout
            #:neural-network-input-trans
@@ -12,10 +13,10 @@
            #:hidden-layer-activation
            #:output-layer-activation
            #:sigmoid
-           #:tanh%
+           #:%tanh
            #:softmax
            #:leaky-relu
-           #:identity%
+           #:%identity
 
            #:make-neural-network
            #:calculate

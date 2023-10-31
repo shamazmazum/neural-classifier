@@ -59,3 +59,8 @@ start with zero (which is the default).")
 just usual SGD. RMSprop also uses this parameter in accumulation of
 squared partial derivatives of network parameters. Good values are
 0.8-0.9.")
+
+(defun declare-optimizations ()
+  '(declare (optimize
+             (speed 3)
+             (compilation-speed 0))))

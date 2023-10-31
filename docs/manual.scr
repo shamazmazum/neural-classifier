@@ -217,10 +217,10 @@ recognition works.
 
    @cl:with-package[name="neural-classifier"](
       @cl:doc(class sigmoid)
-      @cl:doc(class tanh%)
+      @cl:doc(class %tanh)
       @cl:doc(class softmax)
       @cl:doc(class leaky-relu)
-      @cl:doc(class identity%)
+      @cl:doc(class %identity)
    )
 
    Activation functions differ in how they can be associated with layers of a

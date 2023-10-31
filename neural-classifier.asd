@@ -13,8 +13,8 @@
                (:file "activation")
                (:file "optimizers")
                (:file "neural-network"))
-  :depends-on ((:feature :single-float-tran :sbcl-single-float-tran)
-               :alexandria
+  :depends-on (:alexandria
+               :serapeum
                :magicl/ext-blas
                :magicl/ext-lapack
                :snakes)

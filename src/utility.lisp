@@ -1,9 +1,10 @@
 (in-package :neural-classifier)
 
-(declaim (optimize (speed 3)))
-
+(sera:-> standard-random ()
+         (values single-float &optional))
 (defun standard-random ()
   "Return a random value sampled from a distribution N(0, 1)."
+  #.(declare-optimizations)
   (let ((u1 (random 1f0))
         (u2 (random 1f0)))
     (if (zerop u1)
@@ -11,18 +12,22 @@
         (* (sqrt (* -2.0 (log u1)))
            (cos (* 2 (float pi 0f0) u2))))))
 
+(sera:-> nrandom-generator (&key (:μ single-float) (:σ single-float))
+         (values (sera:-> () (values single-float &optional)) &optional))
 (defun nrandom-generator (&key (μ 0f0) (σ 1f0))
   "Return a function which generates random values from a distibution
 N(μ, σ)."
-  (declare (type single-float μ σ))
+  #.(declare-optimizations)
   (lambda ()
     (+ μ (* σ (standard-random)))))
 
+(sera:-> idx-abs-max (magicl:matrix/single-float)
+         (values non-negative-fixnum &optional))
 (defun idx-abs-max (matrix)
   "Returns index of first element with maximal absolute value by
   calling isamax() function from BLAS. Works only for rows or
   columns."
-  (declare (type magicl:matrix/single-float matrix))
+  #.(declare-optimizations)
   (let ((shape (magicl:shape matrix)))
     (if (notany
          (lambda (x)
@@ -37,8 +42,10 @@ N(μ, σ)."
          (magicl::storage matrix)
          1))))
 
+(sera:-> sasum (magicl:matrix/single-float)
+         (values (single-float 0.0) &optional))
 (defun sasum (matrix)
-  (declare (type magicl:matrix/single-float matrix))
+  #.(declare-optimizations)
   (magicl.blas-cffi:%sasum
    (magicl:size matrix)
    (magicl::storage matrix)

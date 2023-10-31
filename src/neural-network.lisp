@@ -1,7 +1,4 @@
 (in-package :neural-classifier)
-(declaim (optimize (speed 3)
-                   (debug 0)
-                   (compilation-speed 0)))
 
 (defun make-neural-network (layout &key
                                      input-trans
@@ -89,13 +86,15 @@ Default value for all transformation functions is @c(identity)."
          (error "Incorrect activation functions ~a" activation-funcs))))))
 
 ;; Normal work
+(sera:-> calculate (neural-network t)
+         (values t &optional))
 (defun calculate (neural-network object)
   "Calculate output from the network @c(neural-network) for the object
 @c(object). The input transformation function (specified by
 @c(:input-trans) when creating a network) is applied to the @c(object)
 and the output transformation function (specified by
 @c(:output-trans)) is applied to output Nx1 matrix from the network."
-  (declare (type neural-network neural-network))
+  #.(declare-optimizations)
   (let ((weights (neural-network-weights neural-network))
         (biases  (neural-network-biases  neural-network))
         (activation-funcs (neural-network-activation-funcs neural-network))
@@ -116,10 +115,11 @@ and the output transformation function (specified by
                :initial-value (funcall input-trans object))))))
 
 ;; Training
+(sera:-> calculate-z-and-out (neural-network magicl:matrix/single-float)
+         (values list list &optional))
 (defun calculate-z-and-out (neural-network input)
   "Calculate argument and value of activation function for all layers"
-  (declare (type neural-network neural-network)
-           (type magicl:matrix/single-float input))
+  #.(declare-optimizations)
   (labels ((accumulate-z-and-out (layers input z-acc out-acc)
              (if layers
                  (destructuring-bind (weights biases activation)
@@ -143,9 +143,13 @@ and the output transformation function (specified by
      input
      nil nil)))
 
+(sera:-> calculate-delta (neural-network
+                          list
+                          magicl:matrix/single-float magicl:matrix/single-float)
+         (values list &optional))
 (defun calculate-delta (neural-network z network-output expected-output)
   "Calculate partial derivative of the cost function by z for all layers"
-  (declare (type magicl:matrix/single-float expected-output))
+  #.(declare-optimizations)
   (labels ((backprop (layer acc)
              (if layer
                  (destructuring-bind (w-l+1 activation-l z-l)
@@ -165,9 +169,11 @@ and the output transformation function (specified by
       (magicl:.- network-output
                  expected-output)))))
 
+(sera:-> calculate-gradient (neural-network (cons t t))
+         (values list list &optional))
 (defun calculate-gradient (neural-network sample)
   "Calculate gradient of the cost function"
-  (declare (type cons sample))
+  #.(declare-optimizations)
   (let ((input    (funcall
                    (the function (neural-network-input-trans% neural-network))
                    (car sample)))
@@ -187,10 +193,11 @@ and the output transformation function (specified by
            (mapcar #'weight-grad output delta) ;; Weights
            delta))))))                         ;; Biases
 
+(sera:-> calculate-gradient-minibatch (neural-network list single-float)
+         (values list list &optional))
 (defun calculate-gradient-minibatch (neural-network samples decay-rate)
   "Calculate gradient of the cost function based on multiple input samples"
-  (declare (type list samples)
-           (type single-float decay-rate))
+  #.(declare-optimizations)
   (let ((scale (/ (float (length samples)))))
     (flet ((sum-matrices (matrices1 matrices2)
              (mapc #'magicl:.+
@@ -218,6 +225,11 @@ and the output transformation function (specified by
                  weights)
          (mapcar #'final-biases biases))))))
 
+(sera:-> train-epoch (neural-network
+                      snakes:basic-generator
+                      &key
+                      (:optimizer optimizer))
+         (values &optional))
 (defun train-epoch (neural-network generator
                     &key (optimizer (make-instance 'sgd-optimizer)))
   "Perform training of @c(neural-network) on every object returned
@@ -226,9 +238,7 @@ must be in the form @c((data-object . label)) cons
 pair. @c(input-trans%) and @c(label-trans) functions passes to
 @c(make-neural-network) are applied to @c(car) and @c(cdr) of each
 pair respectively."
-  (declare (type neural-network neural-network)
-           (type snakes:basic-generator generator)
-           (type optimizer optimizer))
+  #.(declare-optimizations)
   (let ((minibatch-size (optimizer-minibatch-size optimizer)))
     (loop
        for minibatch-samples =
@@ -241,8 +251,14 @@ pair respectively."
          (when (zerop (rem i 1000))
            (format *standard-output* "~d... " i)
            (force-output))
-       finally (terpri))))
+       finally (terpri)))
+  (values))
 
+(sera:-> rate (neural-network
+               snakes:basic-generator
+               &key
+               (:test (sera:-> (t t) (values boolean &optional))))
+         (values single-float &optional))
 (defun rate (neural-network generator &key (test #'eql))
   "Calculate accuracy of the @c(neural-network) (ratio of correctly
 guessed samples to all samples) using testing data from the generator
