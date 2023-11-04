@@ -33,6 +33,7 @@
            #:rmsprop-optimizer
 
            #:*momentum-coeff*
+           #:*learning-rate-increase-coeff*
            #:*learning-rate*
            #:*decay-rate*
            #:*minibatch-size*))

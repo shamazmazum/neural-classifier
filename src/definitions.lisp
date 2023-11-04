@@ -54,11 +54,12 @@ objects in the training set and @c(λ) must be about 1-10. If not sure,
 start with zero (which is the default).")
 (defparameter *minibatch-size* 10
   "Number of samples to be used for one update of network parameters.")
-(defparameter *momentum-coeff* 0.8
+(defparameter *momentum-coeff* 0.9
   "Hyperparameter for SGD optimizers which use momentum. Zero means
 just usual SGD. RMSprop also uses this parameter in accumulation of
 squared partial derivatives of network parameters. Good values are
 0.8-0.9.")
+(defparameter *learning-rate-increase-coeff* 0.99)
 
 (defun declare-optimizations ()
   '(declare (optimize

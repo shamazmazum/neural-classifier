@@ -37,9 +37,8 @@
                                      (apply #'make-instance optimizer
                                             (concatenate
                                              'list
-                                             (if (subtypep
-                                                  (find-class optimizer)
-                                                  'neural-classifier:memoizing-optimizer)
+                                             (if (not (eq optimizer
+                                                          'neural-classifier:sgd-optimizer))
                                                  (list :neural-network net))
                                              parameters)))))))
              ;; Check that final recognition rates for train and test
