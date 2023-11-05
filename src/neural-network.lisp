@@ -8,8 +8,8 @@
                                      activation-funcs)
   "Create a new neural network.
 @begin(list)
-@item(@c(layout) is a list of positive integers which describes the
-      amount of neurons in each layer (starting from input layer).)
+@item(@c(layout) is a list of positive integers which describes a
+      number of neurons in each layer (starting from input layer).)
 @item(@c(activation-funcs) is a list all the elements of which are
       objects of type @c(activation). The length of this list must be
       equal to the length of @c(layout) minus one because the input

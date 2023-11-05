@@ -27,14 +27,18 @@ with an output layer. Not to be instantiated."))
 (sera:-> σ (single-float)
          (values (single-float 0.0 1.0) &optional))
 (defun σ (z)
-  "Sigmoid activation function."
+  "Sigmoid activation function"
   #.(declare-optimizations)
   (/ (1+ (exp (- z)))))
 
 (defclass sigmoid (hidden-layer-activation
                    output-layer-activation)
   ()
-  (:documentation "Sigmoid activation function."))
+  (:documentation "Sigmoid activation function:
+\\(f(x) = \\frac{1}{1 + \\exp(-x)}\\)
+
+Has output in the range \\([0, 1]\\), so it's most suited for
+describing 'intensity' of some property."))
 
 (defmethod activate (vector (activation sigmoid))
   #.(declare-optimizations)
@@ -52,7 +56,10 @@ with an output layer. Not to be instantiated."))
 (defclass %tanh (hidden-layer-activation
                  output-layer-activation)
   ()
-  (:documentation "Hyberbolic tangent activation function."))
+  (:documentation "Hyberbolic tangent activation function. Has output
+in the range \\([-1, 1]\\), so it's a rescaled sigmoid. Neural
+networks which use tanh in place of sigmoid are believed to be more
+trainable."))
 
 (defmethod activate (vector (activation %tanh))
   #.(declare-optimizations)
@@ -69,13 +76,16 @@ with an output layer. Not to be instantiated."))
 
 ;; Leaky ReLU
 (defclass leaky-relu (hidden-layer-activation)
-  ((coeff :initarg  :coeff
-          :initform 0f0
-          :type     single-float
-          :reader   leaky-relu-coeff))
+  ((coeff :initarg       :coeff
+          :initform      0f0
+          :type          single-float
+          :reader        leaky-relu-coeff
+          :documentation "Coefficient of leaky ReLU. A value of 0
+means just an ordinary ReLU."))
   (:documentation "Leaky ReLU activation function. It returns its
 argument when it is greater than zero or the argument multiplied by
-@c(coeff) otherwise."))
+@c(coeff) otherwise. Usually this is an activation function of choice
+for hidden layers."))
 
 (defmethod activate (vector (activation leaky-relu))
   #.(declare-optimizations)
@@ -100,7 +110,10 @@ argument when it is greater than zero or the argument multiplied by
 ;; Softmax
 (defclass softmax (output-layer-activation)
   ()
-  (:documentation "Softmax activation function."))
+  (:documentation "Softmax activation function: \\(f(x_i) =
+\\frac{\\exp(x_i)}{\\sum_i \\exp(x_i)}\\).
+It's output range is \\([0, 1]\\) and a sum of all elements in the
+output vector is 1."))
 
 (defmethod activate (vector (activation softmax))
   #.(declare-optimizations)
@@ -110,8 +123,7 @@ argument when it is greater than zero or the argument multiplied by
 ;; Identity
 (defclass %identity (output-layer-activation)
   ()
-  (:documentation "Identity activation function (does nothing on its
-input)."))
+  (:documentation "Identity activation function (just returns its input)."))
 
 (defmethod activate (vector (activation %identity))
   vector)

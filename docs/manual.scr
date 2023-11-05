@@ -4,43 +4,44 @@
    solving classification problem (and maybe other problems). For a basic use
    read README file on the
    @link[uri="http://github.com/shamazmazum/neural-classifier"](GitHub page).
-   Here the API is described in more details.
+   Here the API is described in more detail.
 @end(section)
 
 @begin(section)
    @title(General information)
    Typical neural network lifecycle is the following:
    @begin(enum)
-      @item(Adjust hyperparameters if you want. See
-            @ref[id=hyper](Hyperparameters) section for details. Default values
-            are usually OK.)
       @item(Create a @c(snakes) generator which will return data for the
             training step in the form @c((data-object . label)) (i.e. cons pair
             which contains a sample for training and a label which describes
             that sample).)
-      @item(Create four functions: The first and the second translate a sample
+      @item(Create four functions: The first two functions translate a sample
             returned by the generator created in the previous step to
-            @c(magicl:matrix/single-float) matrix with dimensions @c(Nx1). One
-            of them will be used by @c(calculate) function and another one will
-            be used during the training. The function used for training may make
-            additional random transformations of the input data to extend
-            training set. The third translates a label to
-            @c(magicl:matrix/single-float) matrix with dimensions @c(Mx1) and
-            the fourth translates a matrix with dimensions @c(Mx1)to a label.
-            Obviously the third function is used for training and the
-            fourth is used for classifing objects with trained net.)
+            @c(magicl:matrix/single-float) matrix with dimensions @c(Nx1) which
+            serves as an input into neural network. One of these functions is
+            used for training and another for operation of a trained network.
+            The function used for training may make additional random
+            transformations of the input data to extend a training set. The
+            third function translates a label to @c(magicl:matrix/single-float)
+            matrix with dimensions @c(Mx1) and the fourth translates a matrix
+            with dimensions @c(Mx1)to a label. Obviously the third function is
+            used for training and the fourth is used for classifing objects with
+            trained net.)
       @item(Create a neural network with
             @c(neural-classifier:make-neural-network). The first parameter,
-            @c(layout), must be a list @c((N ... M)), where @c(N) and @c(M) are
-            taken from the previous step. Also is accepts created transformation
-            functions.)
+            @c(layout), must be a list @c((N ... M)) which contains numbers of
+            neurons in each layer of the network, where @c(N) and @c(M) are
+            taken from the previous step. Also pass the functions created in the
+            previous step as arguments to @c(make-neural-network).)
       @item(Train a neural network calling
             @c(neural-classifier:train-epoch). An epoch is finished when
             supplied generator doesn't have any more data (i.e. returns
-            @c(snakes:generator-stop)).)
-      @item(Repeat steps 2 and 5 to train for more epochs. You can use
-            @c(neural-classifier:rate) function to control the accuracy of your
-            network, so you know where to stop training.)
+            @c(snakes:generator-stop)). This function accepts an optimizer as an
+            optional parameter. Visit @ref[id=optimizers](optimizers) section
+            for more information about optimizers.)
+      @item(Repeat the previous step to train for a higher number of epochs. You
+            can use @c(neural-classifier:rate) function to control the accuracy
+            of your network, so you know where to stop training.)
       @item(After the net is trained, call @c(neural-classifier:calculate) to
             pass your data through the net.)
    @end(enum)
@@ -123,97 +124,40 @@ If you want another example, look at @c(mnist/mnist.lisp) to see how digit
 recognition works.
 @end(section)
 
-@begin[ref=hyper](section)
-   @title(Hyperparameters)
-   These hyperparameters are used in the library (@c(neural-classifier) package
-   is omitted for brevity).
-
-   @begin(table)
-     @begin(row)
-       @cell(Name)
-       @cell(Meaning)
-       @cell(Where/when used)
-     @end(row)
-     @begin(row)
-       @cell(@c(*learning-rate*))
-       @cell(How fast the network learns)
-       @cell(While training with all optimizers)
-     @end(row)
-     @begin(row)
-       @cell(@c(*decay-rate*))
-       @cell(Parameter for L^2 regularization)
-       @cell(While training)
-     @end(row)
-     @begin(row)
-       @cell(@c(*minibatch-size*))
-       @cell(Calculate cost function gradient using how many samples?)
-       @cell(While training)
-     @end(row)
-     @begin(row)
-       @cell(@c(*momentum-coeff*))
-       @cell(Parameter for optimizer algorithms)
-       @cell(While training using momentum-based optimizers (or RMSprop with
-             slightly different meaning))
-     @end(row)
-   @end(table)
-
-   @cl:with-package[name="neural-classifier"](
-      @cl:doc(variable *learning-rate*)
-      @cl:doc(variable *decay-rate*)
-      @cl:doc(variable *minibatch-size*)
-      @cl:doc(variable *momentum-coeff*)
-   )
-@end(section)
-
-@begin(section)
+@begin[ref=optimizers](section)
    @title(Optimizers)
    By default, @c(neural-classifier:train-epoch) uses stochastic gradient descent
    (SGD) algorithm to minimize the cost function. There are other optimizers
-   which can be used in learn process. You can create an optimizer by
+   which can be used during learning. You can create an optimizer by
    instantiating of of the optimizer classes (which are subclasses of
-   @c(neural-classifier:optimizer) and pass it to
-   @c(neural-classifier:train-epoch) function. This is a list of optimizers. All
-   symbols are in @c(neural-classifier) package.
+   @c(neural-classifier:optimizer)) and pass it to
+   @c(neural-classifier:train-epoch) function. A complete list of optimizers is
+   below. A symbol \(f\) present in the documentation denotes the cost
+   function. A learning rate is specified using @c(:η) initarg. Initargs @c(:β1)
+   and @c(:β2) are common for optimizers with momentum and variable learning
+   rate respectively.
 
-   @begin(table)
-     @begin(row)
-       @cell(Symbol)
-       @cell(Optimizer)
-     @end(row)
-     @begin(row)
-       @cell(@c(sgd-optimizer))
-       @cell(SGD optimizer)
-     @end(row)
-     @begin(row)
-       @cell(@c(momentum-optimizer))
-       @cell(SGD with momentum)
-     @end(row)
-     @begin(row)
-       @cell(@c(nesterov-optimizer))
-       @cell(Nesterov accelerated gradient (NAG) optimizer)
-     @end(row)
-     @begin(row)
-       @cell(@c(adagrad-optimizer))
-       @cell(Adagrad optimizer)
-     @end(row)
-     @begin(row)
-       @cell(@c(rmsprop-optimizer))
-       @cell(RMSprop optimizer)
-     @end(row)
-   @end(table)
+   @cl:with-package[name="neural-classifier"](
+      @cl:doc(class optimizer)
+      @cl:doc(class sgd-optimizer)
+      @cl:doc(class momentum-optimizer)
+      @cl:doc(class nesterov-optimizer)
+      @cl:doc(class adagrad-optimizer)
+      @cl:doc(class rmsprop-optimizer)
+      @cl:doc(class adam-optimizer)
+   )
 
    Here is a plot showing how accuracy of classification of test data from
    fashion MNIST set varies with the number of training epochs. Networks used in
    this example have one hidden layer with 50 neurons. All activation functions
-   are sigmoids. Accuracy are averaged from 3 independent runs. Hyperparameters
-   used are @c(*learning-rate*) = 0.001, @c(*decay-rate*) = 0, @c(*minibatch-size*)
-   = 20, @c(*momentum-coeff*) = 0.9.
+   are sigmoids. Accuracy are averaged from 3 independent runs.
    @image[src=optimizers.png]()
 @end(section)
 
 @begin(section)
    @title(Activation functions)
-   These activation functions are supported:
+   Activation functions are inserted after each layer of a neural network. These
+   activation functions are supported:
 
    @cl:with-package[name="neural-classifier"](
       @cl:doc(class sigmoid)
@@ -242,7 +186,6 @@ recognition works.
    @u(Functions)
    @cl:with-package[name="neural-classifier"](
       @cl:doc(function make-neural-network)
-      @cl:doc(function make-optimizer)
       @cl:doc(function calculate)
       @cl:doc(function train-epoch)
       @cl:doc(function rate)

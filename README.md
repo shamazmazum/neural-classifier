@@ -25,12 +25,6 @@ MNIST/EMNIST datasets. For API documentation visit
 * To test your own digits convert them to `784x1` matrix of type
   `magicl:matrix/single-float` and pass it to `neural-classifier:calculate`
   function.
-* Also you can play with some other hyper-parameters, not only the number of
-  hidden neurons. `neural-classifier:*learn-rate*` is how fast gradient descent
-  algorithm works (i.e. how fast your network learns),
-  `neural-classifier:*decay-rate*` is related to regularization and should be
-  about `5/N` where `N` is a number of training samples. Zero means no
-  regularization.
 
 ## How to build custom nets and data?
 

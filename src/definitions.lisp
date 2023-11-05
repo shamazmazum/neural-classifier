@@ -40,9 +40,7 @@
                      :documentation "Function which translates a label to a vector"))
   (:documentation "Class for neural networks"))
 
-(declaim (type single-float
-               *learning-rate* *decay-rate*)
-         (type positive-fixnum *minibatch-size*))
+#|
 (defparameter *learning-rate* 0.005f0
   "Learning speed for gradient descent algorithms. Bigger values
 result in faster learning, but too big is bad. Default value is good
@@ -60,6 +58,7 @@ just usual SGD. RMSprop also uses this parameter in accumulation of
 squared partial derivatives of network parameters. Good values are
 0.8-0.9.")
 (defparameter *learning-rate-increase-coeff* 0.99)
+|#
 
 (defun declare-optimizations ()
   '(declare (optimize

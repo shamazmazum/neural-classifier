@@ -20,43 +20,31 @@
 (defclass optimizer ()
   ((learning-rate  :type          single-float
                    :reader        optimizer-learning-rate
-                   :initarg       :learning-rate
-                   :initform      *learning-rate*
-                   :documentation "Learning rate of the
-optimizer. Must be a small positive value.")
+                   :initarg       :η
+                   :documentation "Parameter which controls learning
+speed of the neural network. Must be a small positive value.")
    (minibatch-size :type          positive-fixnum
                    :reader        optimizer-minibatch-size
                    :initarg       :minibatch-size
-                   :initform      *minibatch-size*
-                   :documentation "Minibatch size hyperparameter used
-for learing. An integer in the range 10-100 is good.")
+                   :initform      40
+                   :documentation "Number of samples in a
+minibatch. An integer in the range 10-100 is good for this
+parameter.")
    (decay-rate     :type          single-float
                    :reader        optimizer-decay-rate
                    :initarg       :decay-rate
-                   :initform      *decay-rate*
+                   :initform      0.0
                    :documentation "A parameter used for L²
 regularization. 0.0 is no regularization. Good values are 1-10 divided
 by the dataset size."))
   (:documentation "Generic optimizer class. Not to be instantiated"))
-
-(defclass sgd-optimizer (optimizer) ()
-  (:documentation "The simplest SGD optimizer"))
-
-(defclass memoizing-optimizer (optimizer)
-  ((weights       :type list
-                  :accessor optimizer-weights)
-   (biases        :type list
-                  :accessor optimizer-biases))
-  (:documentation "Optimizer which memoizes some old state related to
-weights and biases. Not to be instantiated."))
 
 (defclass momentum-memo-optimizer (optimizer)
   ((momentum-memo  :type          memo
                    :accessor      optimizer-momentum-memo)
    (momentum-coeff :type          single-float
                    :reader        optimizer-momentum-coeff
-                   :initarg       :momentum-coeff
-                   :initform      *momentum-coeff*
+                   :initarg       :β1
                    :documentation "Coefficient responsible for momentum decay"))
   (:documentation "Optimizer based on momentum. Not to be instantiated."))
 
@@ -74,8 +62,7 @@ weights and biases. Not to be instantiated."))
                :accessor      optimizer-rate-memo)
    (rate-coeff :type          single-float
                :reader        optimizer-rate-coeff
-               :initarg       :rate-coeff
-               :initform      *learning-rate-increase-coeff*
+               :initarg       :β2
                :documentation "Coefficient responsible to increase in learning rate"))
   (:documentation "Optimizer based on adaptive learning rate. Not to be instantiated."))
 
@@ -88,31 +75,87 @@ weights and biases. Not to be instantiated."))
     (setf (optimizer-rate-memo optimizer)
           (make-memo network))))
 
-(defclass momentum-optimizer (momentum-memo-optimizer)
-  ()
-  (:documentation "SGD optimizer with momentum"))
+(defclass sgd-optimizer (optimizer) ()
+  (:default-initargs
+    :η 1f-2)
+  (:documentation "A basic stochastic gradient optimizer. A parameter
+\\(w\\) of a neural network is updated as \\(w_{n+1} = w_n - \\eta
+\\nabla f(w_n)\\)."))
 
-(defclass nesterov-optimizer (momentum-memo-optimizer)
-  ()
-  (:documentation "Nesterov accelerated SGD, improvement of SGD with
-momentum"))
+(defclass momentum-optimizer (momentum-memo-optimizer) ()
+  (:default-initargs
+    :η  1f-2
+    :β1 0.9)
+  (:documentation "Stochastic gradient descent optimizer with
+momentum. A parameter \\(w\\) of a neural network is updated with
+respect to an accumulated momentum \\(m\\):
 
-(defclass adagrad-optimizer (rate-memo-optimizer)
-  ()
-  (:documentation "Adagrad optimizer"))
+\\(m_{n+1} = \\beta_1 m_{n} + \\eta \\nabla f(w_n)\\)
 
-(defclass rmsprop-optimizer (rate-memo-optimizer)
-  ()
-  (:documentation "RMSprop optimizer"))
+\\(w_{n+1} = w_n - m_{n+1}\\)"))
+
+(defclass nesterov-optimizer (momentum-memo-optimizer) ()
+  (:default-initargs
+    :η  1f-2
+    :β1 0.9)
+  (:documentation "Nesterov optimizer: a stochastic gradient descent
+with momentum and 'look-ahead'. A parameter \\(w\\) of a neural
+network is updated with respect to an accumulated momentum \\(m\\):
+
+\\(m_{n+1} = \\beta_1 m_{n} + \\eta \\nabla f(w_n - \\beta_1 m_n)\\)
+
+\\(w_{n+1} = w_n - m_{n+1}\\)"))
+
+(defclass adagrad-optimizer (rate-memo-optimizer) ()
+  (:default-initargs
+    :η 1f-2)
+  (:documentation "Adagrad optimizer: an optimizer with decaying
+learning rate. A parameter \\(w\\) of a neural network is updated as
+follows:
+
+\\(s_{n+1} = s_n + (\\nabla f(w_n))^2\\)
+
+\\(w_{n+1} = w_n - \\frac{\\eta}{\\sqrt{s_{n+1} + \\epsilon}} \\nabla f(w_n)\\)"))
+
+(defclass rmsprop-optimizer (rate-memo-optimizer) ()
+  (:default-initargs
+    :η  1f-3
+    :β2 0.99)
+  (:documentation "RMSprop optimizer: an optimizer with adaptive
+learning rate.  A parameter \\(w\\) of a neural network is updated as
+follows:
+
+\\(s_{n+1} = \\beta_2 s_n + (1 - \\beta_2) (\\nabla f(w_n))^2\\)
+
+\\(w_{n+1} = w_n - \\frac{\\eta}{\\sqrt{s_{n+1} + \\epsilon}} \\nabla f(w_n)\\)"))
+
 
 (defclass adam-optimizer (momentum-memo-optimizer rate-memo-optimizer)
-  ((corrected-momentum-coeff :type     single-float
-                             :initform 1.0
-                             :accessor optimizer-corrected-momentum-coeff)
-   (corrected-rate-coeff     :type     single-float
-                             :initform 1.0
-                             :accessor optimizer-corrected-rate-coeff))
-  (:documentation "ADAM optimizer"))
+  ((corrected-momentum-coeff :type          single-float
+                             :initform      1.0
+                             :documentation "Corrected \\(\\beta_1\\) parameter"
+                             :accessor      optimizer-corrected-momentum-coeff)
+   (corrected-rate-coeff     :type          single-float
+                             :initform      1.0
+                             :documentation "Corrected \\(\\beta_2\\) parameter"
+                             :accessor      optimizer-corrected-rate-coeff))
+  (:default-initargs
+    :η  1f-3
+    :β1 0.9
+    :β2 0.999)
+  (:documentation "ADAM optimizer: an optimizer with adaptive learning
+rate and momentum.  A parameter \\(w\\) of a neural network is updated
+as follows:
+
+\\(m_{n+1} = \\beta_1 m_n + (1 - \\beta_1) \\nabla f(w_n)\\)
+
+\\(s_{n+1} = \\beta_2 s_n + (1 - \\beta_2) (\\nabla f(w_n))^2\\)
+
+\\(\\hat{m} = m_{n+1} / (1 - \\beta_1^n) \\)
+
+\\(\\hat{s} = s_{n+1} / (1 - \\beta_2^n) \\)
+
+\\(w_{n+1} = w_n - \\frac{\\eta}{\\sqrt{\\hat{s} + \\epsilon}} \\hat{m}\\)"))
 
 (defgeneric learn (optimizer neural-network samples)
   (:documentation "Update network parameters using SAMPLES for training."))
