@@ -42,7 +42,7 @@
   <h1 class="doc-title">neural-classifier</h1>
   <article id="article" data-section="api-documentation">
     <aside>
-      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="activation-functions.html" data-node="activation-functions">Activation functions</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="activation-functions.html" data-node="activation-functions">Activation functions</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
     </aside>
     <main class="codex-section">
       <header>
@@ -58,8 +58,8 @@
    <u>Functions</u>
    
       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">make-neural-network</code><code class="codex-lambda-list">(layout &amp;key input-trans output-trans input-trans% label-trans activation-funcs)</code><div class="codex-docstring">Create a new neural network.
-<ul><li><code>layout</code> is a list of positive integers which describes the
-      amount of neurons in each layer (starting from input layer).</li><li><code>activation-funcs</code> is a list all the elements of which are
+<ul><li><code>layout</code> is a list of positive integers which describes a
+      number of neurons in each layer (starting from input layer).</li><li><code>activation-funcs</code> is a list all the elements of which are
       objects of type <code>activation</code>. The length of this list must be
       equal to the length of <code>layout</code> minus one because the input
       layer does not have an activation function. The last element
@@ -88,13 +88,12 @@
       <code>10x1</code> matrix of all zeros with exception for <code>n</code>-th element
       which would be <code>1f0</code>.</li></ul>
 Default value for all transformation functions is <code>identity</code>.</div></div>
-      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">make-optimizer</code><code class="codex-lambda-list">(type network)</code><div class="codex-docstring">Make optimizer of type <code>type</code> for a network <code>network</code>.</div></div>
       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">calculate</code><code class="codex-lambda-list">(neural-network object)</code><div class="codex-docstring">Calculate output from the network <code>neural-network</code> for the object
 <code>object</code>. The input transformation function (specified by
 <code>:input-trans</code> when creating a network) is applied to the <code>object</code>
 and the output transformation function (specified by
 <code>:output-trans</code>) is applied to output Nx1 matrix from the network.</div></div>
-      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">train-epoch</code><code class="codex-lambda-list">(neural-network generator &amp;key (optimizer (make-optimizer (quote sgd-optimizer) neural-network)) (learn-rate *learn-rate*) (decay-rate *decay-rate*) (minibatch-size *minibatch-size*))</code><div class="codex-docstring">Perform training of <code>neural-network</code> on every object returned
+      <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">train-epoch</code><code class="codex-lambda-list">(neural-network generator &amp;key (optimizer (make-instance (quote sgd-optimizer))))</code><div class="codex-docstring">Perform training of <code>neural-network</code> on every object returned
 by the generator <code>generator</code>. Each item returned by <code>generator</code>
 must be in the form <code>(data-object . label)</code> cons
 pair. <code>input-trans%</code> and <code>label-trans</code> functions passes to

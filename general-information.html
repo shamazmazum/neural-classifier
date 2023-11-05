@@ -42,7 +42,7 @@
   <h1 class="doc-title">neural-classifier</h1>
   <article id="article" data-section="general-information">
     <aside>
-      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="hyper.html" data-node="hyper">Hyperparameters</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="activation-functions.html" data-node="activation-functions">Activation functions</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="general-information.html" data-node="general-information">General information</a></li><li><a href="optimizers.html" data-node="optimizers">Optimizers</a></li><li><a href="activation-functions.html" data-node="activation-functions">Activation functions</a></li><li><a href="api-documentation.html" data-node="api-documentation">API documentation</a></li></ol>
     </aside>
     <main class="codex-section">
       <header>
@@ -51,31 +51,33 @@
       <div class="content">
         <p>
    Typical neural network lifecycle is the following:
-   </p><ol><li>Adjust hyperparameters if you want. See
-            <a id="hyper" href="hyper.html" data-node="hyper">Hyperparameters</a> section for details. Default values
-            are usually OK.</li><li>Create a <code>snakes</code> generator which will return data for the
+   </p><ol><li>Create a <code>snakes</code> generator which will return data for the
             training step in the form <code>(data-object . label)</code>(i.e. cons pair
             which contains a sample for training and a label which describes
-            that sample).</li><li>Create four functions: The first and the second translate a sample
+            that sample).</li><li>Create four functions: The first two functions translate a sample
             returned by the generator created in the previous step to
-            <code>magicl:matrix/single-float</code> matrix with dimensions <code>Nx1</code>. One
-            of them will be used by <code>calculate</code> function and another one will
-            be used during the training. The function used for training may make
-            additional random transformations of the input data to extend
-            training set. The third translates a label to
-            <code>magicl:matrix/single-float</code> matrix with dimensions <code>Mx1</code> and
-            the fourth translates a matrix with dimensions <code>Mx1</code>to a label.
-            Obviously the third function is used for training and the
-            fourth is used for classifing objects with trained net.</li><li>Create a neural network with
+            <code>magicl:matrix/single-float</code> matrix with dimensions <code>Nx1</code> which
+            serves as an input into neural network. One of these functions is
+            used for training and another for operation of a trained network.
+            The function used for training may make additional random
+            transformations of the input data to extend a training set. The
+            third function translates a label to <code>magicl:matrix/single-float</code>
+            matrix with dimensions <code>Mx1</code> and the fourth translates a matrix
+            with dimensions <code>Mx1</code>to a label. Obviously the third function is
+            used for training and the fourth is used for classifing objects with
+            trained net.</li><li>Create a neural network with
             <code>neural-classifier:make-neural-network</code>. The first parameter,
-            <code>layout</code>, must be a list <code>(N ... M)</code>, where <code>N</code> and <code>M</code> are
-            taken from the previous step. Also is accepts created transformation
-            functions.</li><li>Train a neural network calling
+            <code>layout</code>, must be a list <code>(N ... M)</code> which contains numbers of
+            neurons in each layer of the network, where <code>N</code> and <code>M</code> are
+            taken from the previous step. Also pass the functions created in the
+            previous step as arguments to <code>make-neural-network</code>.</li><li>Train a neural network calling
             <code>neural-classifier:train-epoch</code>. An epoch is finished when
             supplied generator doesn't have any more data (i.e. returns
-            <code>snakes:generator-stop</code>).</li><li>Repeat steps 2 and 5 to train for more epochs. You can use
-            <code>neural-classifier:rate</code> function to control the accuracy of your
-            network, so you know where to stop training.</li><li>After the net is trained, call <code>neural-classifier:calculate</code> to
+            <code>snakes:generator-stop</code>). This function accepts an optimizer as an
+            optional parameter. Visit <a id="optimizers" href="optimizers.html" data-node="optimizers">optimizers</a> section
+            for more information about optimizers.</li><li>Repeat the previous step to train for a higher number of epochs. You
+            can use <code>neural-classifier:rate</code> function to control the accuracy
+            of your network, so you know where to stop training.</li><li>After the net is trained, call <code>neural-classifier:calculate</code> to
             pass your data through the net.</li></ol><p>Abstact example: find a human face on photo.</p><pre><code class="lisp">(defun load-image (pathname)
   ;; Assume that our images are PNGs prescaled to 50x50 pixels
   (let ((image (opticl:coerce-image
