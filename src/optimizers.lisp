@@ -105,6 +105,15 @@ momentum"))
   ()
   (:documentation "RMSprop optimizer"))
 
+(defclass adam-optimizer (momentum-memo-optimizer rate-memo-optimizer)
+  ((corrected-momentum-coeff :type     single-float
+                             :initform 1.0
+                             :accessor optimizer-corrected-momentum-coeff)
+   (corrected-rate-coeff     :type     single-float
+                             :initform 1.0
+                             :accessor optimizer-corrected-rate-coeff))
+  (:documentation "ADAM optimizer"))
+
 (defgeneric learn (optimizer neural-network samples)
   (:documentation "Update network parameters using SAMPLES for training."))
 
@@ -235,4 +244,48 @@ momentum"))
               (acc-biases  (memo-biases  memo)))
           (mapc #'update weights delta-weight acc-weights)
           (mapc #'update biases  delta-bias   acc-biases)))))
+  (values))
+
+(defmethod learn ((optimizer adam-optimizer) neural-network samples)
+  #.(declare-optimizations)
+  (let ((learning-rate  (optimizer-learning-rate  optimizer))
+        (decay-rate     (optimizer-decay-rate     optimizer))
+        (rate-coeff     (optimizer-rate-coeff     optimizer))
+        (momentum-coeff (optimizer-momentum-coeff optimizer)))
+    (declare (type single-float rate-coeff momentum-coeff))
+    (with-accessors ((corrected-rate-coeff     optimizer-corrected-rate-coeff)
+                     (corrected-momentum-coeff optimizer-corrected-momentum-coeff))
+        optimizer
+      (declare (type single-float corrected-rate-coeff corrected-momentum-coeff))
+      (setf corrected-rate-coeff (* corrected-rate-coeff rate-coeff)
+            corrected-momentum-coeff (* corrected-momentum-coeff momentum-coeff))
+      (flet ((update (x delta-x accumulated-rate accumulated-momentum)
+               (magicl:.+
+                (magicl:scale (magicl:.* delta-x delta-x) (- 1 rate-coeff))
+                (magicl:scale accumulated-rate rate-coeff)
+                accumulated-rate)
+               (magicl:.+
+                (magicl:scale delta-x (- 1 momentum-coeff))
+                (magicl:scale accumulated-momentum momentum-coeff)
+                accumulated-momentum)
+               (let ((corrected-rate (magicl:scale accumulated-rate
+                                                   (/ (- 1 corrected-rate-coeff))))
+                     (corrected-momentum (magicl:scale accumulated-momentum
+                                                       (/ (- 1 corrected-momentum-coeff)))))
+                 (magicl:.-
+                  x
+                  (magicl:./
+                   (magicl:scale corrected-momentum learning-rate)
+                   (magicl:map #'sqrt (magicl:.+ corrected-rate 1f-12)))
+                  x))))
+      (multiple-value-bind (delta-weight delta-bias)
+          (calculate-gradient-minibatch neural-network samples decay-rate)
+        (let ((weights (neural-network-weights neural-network))
+              (biases  (neural-network-biases  neural-network))
+              (momentum-memo (optimizer-momentum-memo  optimizer))
+              (rate-memo     (optimizer-rate-memo      optimizer)))
+          (mapc #'update weights delta-weight
+                (memo-weights rate-memo) (memo-weights momentum-memo))
+          (mapc #'update biases delta-bias
+                (memo-biases rate-memo) (memo-biases momentum-memo)))))))
   (values))

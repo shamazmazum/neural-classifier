@@ -31,6 +31,7 @@
            #:nesterov-optimizer
            #:adagrad-optimizer
            #:rmsprop-optimizer
+           #:adam-optimizer
 
            #:*momentum-coeff*
            #:*learning-rate-increase-coeff*
