@@ -49,4 +49,8 @@
     (test-optimizer 'neural-classifier:momentum-optimizer :learning-rate 1f-2)
     (test-optimizer 'neural-classifier:nesterov-optimizer :learning-rate 1f-2)
     (test-optimizer 'neural-classifier:adagrad-optimizer  :learning-rate 1f-2)
-    (test-optimizer 'neural-classifier:rmsprop-optimizer  :learning-rate 1f-3)))
+    (test-optimizer 'neural-classifier:rmsprop-optimizer  :learning-rate 1f-3)
+    (test-optimizer 'neural-classifier:adam-optimizer
+                    :learning-rate 1f-3
+                    :momentum-coeff 0.9
+                    :rate-coeff     0.999)))
