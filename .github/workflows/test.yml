@@ -5,8 +5,6 @@ on: [push, pull_request]
 jobs:
   tests:
     runs-on: ubuntu-latest
-    env:
-      LISP: sbcl
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -15,14 +13,13 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install info install-info libblas-dev liblapack-dev
-      - name: Install CIM and Ultralisp
+      - name: Install roswell
         run: |
-          curl -L https://raw.githubusercontent.com/shamazmazum/cl-cirrus/github-actions/install-actions.sh | sh
-          cl -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
-      - name: Build
+          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
+      - name: Install Ultralisp
         run: |
-          cl -l neural-classifier -e '(uiop:quit)'
+          ros -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
       - name: Run tests
         run: |
           cd $GITHUB_WORKSPACE/mnist/dataset && gunzip *gz
-          cl -f $GITHUB_WORKSPACE/tests/actions.lisp
+          ros -l $GITHUB_WORKSPACE/tests/actions.lisp

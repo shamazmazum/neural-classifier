@@ -7,8 +7,6 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
-    env:
-      LISP: sbcl
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -27,16 +25,15 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install info install-info libblas-dev liblapack-dev
-      - name: Install CIM and Ultralisp
+      - name: Install roswell
         run: |
-          curl -L https://raw.githubusercontent.com/shamazmazum/cl-cirrus/github-actions/install-actions.sh | sh
-          cl -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
-      - name: Build
+          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
+      - name: Install Ultralisp
         run: |
-          cl -l neural-classifier -e '(uiop:quit)'
+          ros -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
       - name: Build documentation
         run: |
-          cl -l codex -e '(codex:document :neural-classifier :skip-undocumented t)'
+          ros -s codex -e '(codex:document :neural-classifier :skip-undocumented t)'
       - name: Deploy to GH pages
         uses: peaceiris/actions-gh-pages@v3
         with:
