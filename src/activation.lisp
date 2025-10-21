@@ -117,8 +117,10 @@ output vector is 1."))
 
 (defmethod activate (vector (activation softmax))
   #.(declare-optimizations)
-  (let ((v (magicl:map #'exp vector)))
-    (magicl:scale v (/ (sasum v)))))
+  (let* ((v (magicl:map #'exp vector))
+         (sum (magicl:sum v)))
+    (declare (type single-float sum))
+    (magicl:scale v (/ sum))))
 
 ;; Identity
 (defclass %identity (output-layer-activation)

@@ -77,7 +77,7 @@ Default value for all transformation functions is @c(identity)."
       (cond
         ((null activation-funcs)
          (setf (neural-network-activation-funcs neural-network)
-               (loop repeat n collect (make-instance 'tanh%))))
+               (loop repeat n collect (make-instance '%tanh))))
         ((not (and (= (length activation-funcs) n)
                    (typep (car (last activation-funcs))
                           'output-layer-activation)

@@ -35,18 +35,7 @@ N(μ, σ)."
            (= x 1))
          shape)
         (error "This matrix is not a row or column.")))
-  (1- ; Transform fortran index to lisp index
-   (the fixnum
-        (magicl.blas-cffi:%isamax
-         (magicl:size matrix)
-         (magicl::storage matrix)
-         1))))
-
-(sera:-> sasum (magicl:matrix/single-float)
-         (values (single-float 0.0) &optional))
-(defun sasum (matrix)
-  #.(declare-optimizations)
-  (magicl.blas-cffi:%sasum
-   (magicl:size matrix)
-   (magicl::storage matrix)
-   1))
+  (let* ((storage (magicl::storage matrix))
+         (max (reduce #'max storage :key #'abs)))
+    (declare (type (simple-array single-float (*)) storage))
+    (position max storage)))
